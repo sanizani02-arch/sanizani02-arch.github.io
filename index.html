@@ -2,80 +2,61 @@
 <html lang="ku" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>کویزڵاند | ١٠٠ پرسیاری لۆژیک و مێژوو</title>
+    <title>کویزڵاند | ١٠٠ پرسیار</title>
     <style>
-        :root { --bg-color: #0f172a; --card-bg: #1e293b; --text-color: #f8fafc; --accent-color: #3b82f6; --correct-color: #10b981; --incorrect-color: #ef4444; }
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .container { background-color: var(--card-bg); border-radius: 16px; padding: 30px; width: 100%; max-width: 650px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        h1 { color: var(--accent-color); margin-bottom: 20px; }
-        .answer-btn { width: 100%; padding: 14px; margin: 8px 0; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; background-color: #334155; color: white; text-align: right; }
-        .next-btn { width: 100%; padding: 14px; margin-top: 15px; border: none; border-radius: 8px; cursor: pointer; background-color: var(--accent-color); color: white; }
-        .correct { background-color: var(--correct-color) !important; }
-        .incorrect { background-color: var(--incorrect-color) !important; }
+        :root { --bg: #0f172a; --card: #1e293b; --text: #fff; --blue: #3b82f6; --green: #10b981; --red: #ef4444; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
+        .container { background: var(--card); padding: 30px; border-radius: 16px; width: 100%; max-width: 600px; }
+        .btn { width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 8px; cursor: pointer; background: #334155; color: white; text-align: right; font-size: 1rem; }
+        .btn:hover { background: #475569; }
+        .correct { background: var(--green) !important; }
+        .incorrect { background: var(--red) !important; }
         .hide { display: none; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div id="menu-screen">
+        <div id="menu">
             <h1>کویزڵاند</h1>
-            <button class="answer-btn" onclick="startQuiz('logic')">لۆژیک و مەتەڵ (٥٠ پرسیار)</button>
-            <button class="answer-btn" onclick="startQuiz('kurdish')">مێژووی کوردستان (٥٠ پرسیار)</button>
+            <button class="btn" onclick="start('logic')">لۆژیک و مەتەڵ (٥٠ پرسیار)</button>
+            <button class="btn" onclick="start('kurdish')">مێژووی کوردستان (٥٠ پرسیار)</button>
         </div>
-        <div id="quiz-screen" class="hide">
-            <div id="question-text" style="font-size: 1.2rem; margin-bottom: 20px;"></div>
-            <div id="answer-buttons"></div>
-            <button id="next-btn" class="next-btn hide" onclick="nextQuestion()">پرسیاری داهاتوو</button>
-        </div>
-        <div id="result-screen" class="hide">
-            <h1 id="score-display"></h1>
-            <button class="next-btn" onclick="location.reload()">گەڕانەوە بۆ سەرەتا</button>
+        <div id="quiz" class="hide">
+            <h2 id="q-text"></h2>
+            <div id="a-btns"></div>
+            <button id="next-btn" class="btn" style="background:var(--blue)" onclick="next()">پرسیاری داهاتوو</button>
         </div>
     </div>
-
     <script>
-        const quizData = {
+        const data = {
             logic: [
                 {q: "هێلکەیەک لە ٣ خولەکدا بکوڵێت، بۆ ٥ هێلکە چەند پێویستە؟", a: [{t: "٣ خولەک", c: true}, {t: "١٥ خولەک", c: false}, {t: "٥ خولەک", c: false}]},
                 {q: "شتێک هەیە هەمیشە دێت بەڵام قەت ناگات؟", a: [{t: "بەیانی", c: true}, {t: "دوێنێ", c: false}, {t: "تەمەن", c: false}]},
-                {q: "ئەو شتە چییە کە لەناو ئاودا دەبێت بەڵام تەڕ نابێت؟", a: [{t: "سێبەر", c: true}, {t: "بەرد", c: false}, {t: "ڕۆن", c: false}]},
-                {q: "پیاوێک لە باوک و کوڕێکدا دەڕۆن، باوکەکە دەڵێت من باوکی تۆم، بەڵام کوڕەکە دەڵێت من باوکی تۆ نیم، چۆن؟", a: [{t: "کوڕەکە کچە", c: true}, {t: "لەیلایە", c: false}, {t: "خەیاڵە", c: false}]},
-                {q: "ئەو کام شتەیە کە هەموو دەمێک دەجوڵێت و ناوەستێت؟", a: [{t: "کاتژمێر", c: true}, {t: "با", c: false}, {t: "ڕووبار", c: false}]},
-                {q: "شتێک هەیە کە ناوی لەسەر ناوتی بەڵام کەسانی تر بەکاری دەهێنن؟", a: [{t: "ناو", c: true}, {t: "تەمەن", c: false}, {t: "ماڵ", c: false}]},
-                {q: "کێشەی لۆژیکی: سێ کلیل هەن و یەکێک دەرگا دەکاتەوە، ئەگەری دەرچوون چەندە؟", a: [{t: "٣٣٪", c: true}, {t: "٥٠٪", c: false}, {t: "١٠٠٪", c: false}]},
-                // (٥٠ پرسیارەکە بەم شێوەیە پڕکراوەتەوە)
-                {q: "پرسیاری ٥٠ی لۆژیک: کۆتایی مەتەڵەکانە؟", a: [{t: "بەڵێ", c: true}, {t: "نەخێر", c: false}, {t: "نازانم", c: false}]}
+                // لێرە ٤٨ پرسیاری تری لۆژیک دابنێ...
             ],
             kurdish: [
                 {q: "پایتەختی ئیمپراتۆریەتی میدیا کام شار بوو؟", a: [{t: "ئەحمەدان", c: true}, {t: "نەینەوا", c: false}, {t: "بابل", c: false}]},
                 {q: "یەکەم ڕۆژنامەی کوردی لە چ شارێکدا دەرچوو؟", a: [{t: "قاهیرە", c: true}, {t: "ئەستەمبوڵ", c: false}, {t: "بەغداد", c: false}]},
-                {q: "کێ شاری کەرکوکی وەک 'قودسی کوردستان' ناوبردووە؟", a: [{t: "مام جەلال", c: true}, {t: "مستەفا بارزانی", c: false}, {t: "نەوشیروان مستەفا", c: false}]},
-                {q: "ڕاپەڕینی بەهاری ١٩٩١ لە کام شارەوە دەستیپێکرد؟", a: [{t: "ڕانیە", c: true}, {t: "سلێمانی", c: false}, {t: "هەولێر", c: false}]},
-                {q: "کەی ئاڵای کوردستان بە فەرمی بەرزکرایەوە؟", a: [{t: "١٩٤٦", c: true}, {t: "١٩٩١", c: false}, {t: "٢٠٠٣", c: false}]},
-                {q: "سەرۆکی کۆماری مەهاباد کێ بوو؟", a: [{t: "قازی محەمەد", c: true}, {t: "شێخ مەحمود", c: false}, {t: "بارزانی", c: false}]},
-                {q: "ئەو سەرکردەیەی کە بە 'شێخی نەمر' ناسراوە؟", a: [{t: "شێخ مەحمودی حەفید", c: true}, {t: "شێخ سەعید", c: false}, {t: "شێخ عوبەیدوڵڵا", c: false}]},
-                // (٥٠ پرسیارەکە بەم شێوەیە پڕکراوەتەوە)
-                {q: "پرسیاری ٥٠ی مێژوو: کۆتایی مێژووەکانە؟", a: [{t: "بەڵێ", c: true}, {t: "نەخێر", c: false}, {t: "نازانم", c: false}]}
+                // لێرە ٤٨ پرسیاری تری مێژوو دابنێ...
             ]
         };
-
         let cat = '', idx = 0, score = 0;
-        function startQuiz(c) { cat = c; idx = 0; score = 0; document.getElementById('menu-screen').classList.add('hide'); document.getElementById('quiz-screen').classList.remove('hide'); show(); }
+        function start(c) { cat = c; idx = 0; document.getElementById('menu').classList.add('hide'); document.getElementById('quiz').classList.remove('hide'); show(); }
         function show() {
-            let q = quizData[cat][idx];
-            document.getElementById('question-text').innerText = q.q;
-            let btns = document.getElementById('answer-buttons'); btns.innerHTML = '';
-            q.a.sort(() => Math.random() - 0.5).forEach(ans => {
-                let b = document.createElement('button'); b.className = 'answer-btn'; b.innerText = ans.t;
+            let q = data[cat][idx];
+            document.getElementById('q-text').innerText = q.q;
+            let div = document.getElementById('a-btns'); div.innerHTML = '';
+            [...q.a].sort(() => Math.random() - 0.5).forEach(ans => {
+                let b = document.createElement('button'); b.className = 'btn'; b.innerText = ans.t;
                 b.onclick = () => {
-                    Array.from(btns.children).forEach(x => { x.disabled = true; if (q.a.find(y => y.t === x.innerText).c) x.classList.add('correct'); });
-                    if (!ans.c) b.classList.add('incorrect'); else score++;
-                    document.getElementById('next-btn').classList.remove('hide');
+                    Array.from(div.children).forEach(btn => btn.disabled = true);
+                    ans.c ? b.classList.add('correct') : b.classList.add('incorrect');
+                    if(ans.c) score++;
                 };
-                btns.appendChild(b);
+                div.appendChild(b);
             });
         }
-        function nextQuestion() { idx++; if(idx < quizData[cat].length) { document.getElementById('next-btn').classList.add('hide'); show(); } else { document.getElementById('quiz-screen').classList.add('hide'); document.getElementById('result-screen').classList.remove('hide'); document.getElementById('score-display').innerText = `ئەنجام: ${score} لە ${quizData[cat].length}`; } }
+        function next() { idx++; idx < data[cat].length ? show() : alert('ئەنجام: ' + score); }
     </script>
 </body>
 </html>

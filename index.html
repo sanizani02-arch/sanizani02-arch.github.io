@@ -14,6 +14,8 @@
             --text-muted: #b3b3b3;
             --btn-bg: #2a2a2a;
             --btn-hover: #3a3a3a;
+            --correct-color: #2ecc71;
+            --wrong-color: #e74c3c;
         }
 
         body {
@@ -115,14 +117,44 @@
             transition: all 0.2s ease;
         }
 
-        .option-btn:hover {
+        .option-btn:hover:not([disabled]) {
             background-color: var(--btn-hover);
             border-color: var(--accent-color);
             transform: translateX(-5px);
         }
 
+        .option-btn[disabled] {
+            cursor: default;
+        }
+
+        .option-btn.correct {
+            background-color: var(--correct-color) !important;
+            border-color: var(--correct-color) !important;
+            color: #fff;
+        }
+
+        .option-btn.wrong {
+            background-color: var(--wrong-color) !important;
+            border-color: var(--wrong-color) !important;
+            color: #fff;
+        }
+
         .hidden {
             display: none;
+        }
+
+        #next-btn {
+            background-color: #ffffff;
+            color: #0f2027;
+            margin-top: 25px;
+            width: 100%;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 18px;
+            box-shadow: 0 4px 10px rgba(255,255,255,0.1);
+        }
+        #next-btn:hover {
+            background-color: #e6e6e6;
         }
     </style>
 </head>
@@ -145,6 +177,7 @@
         </div>
         <h3 id="question-text">لێرەدا پرسیارەکە پیشان دەدرێت</h3>
         <div class="options-container" id="options"></div>
+        <button id="next-btn" class="btn-main hidden" onclick="nextQuestion()">دوواتر</button>
     </div>
 
     <!-- لاپەڕەی کۆتایی -->
@@ -173,11 +206,10 @@
     }
 
     function showQuestion() {
-        if(currentQ >= questions.length) {
-            return showEnd();
-        }
+        document.getElementById('next-btn').classList.add('hidden');
         document.getElementById('q-num').innerText = currentQ + 1;
         document.getElementById('question-text').innerText = questions[currentQ].q;
+        
         const optionsDiv = document.getElementById('options');
         optionsDiv.innerHTML = '';
         
@@ -185,18 +217,41 @@
             const btn = document.createElement('button');
             btn.className = 'option-btn';
             btn.innerText = opt;
-            btn.onclick = () => checkAnswer(idx);
+            btn.onclick = () => checkAnswer(idx, btn);
             optionsDiv.appendChild(btn);
         });
     }
 
-    function checkAnswer(selected) {
-        if(selected === questions[currentQ].a) {
+    function checkAnswer(selected, selectedBtn) {
+        const correctIndex = questions[currentQ].a;
+        const optionsDiv = document.getElementById('options');
+        const buttons = optionsDiv.getElementsByClassName('option-btn');
+        
+        // قفڵکردنی هەموو دوگمەکان
+        for (let btn of buttons) {
+            btn.disabled = true;
+        }
+
+        if (selected === correctIndex) {
+            selectedBtn.classList.add('correct');
             score++;
             document.getElementById('score').innerText = score;
+        } else {
+            selectedBtn.classList.add('wrong');
+            buttons[correctIndex].classList.add('correct'); // پیشاندانی وەڵامە ڕاستەکە بە سەوز
         }
+
+        // پیشاندانی دوگمەی دوواتر
+        document.getElementById('next-btn').classList.remove('hidden');
+    }
+
+    function nextQuestion() {
         currentQ++;
-        showQuestion();
+        if (currentQ >= questions.length) {
+            showEnd();
+        } else {
+            showQuestion();
+        }
     }
 
     function showEnd() {

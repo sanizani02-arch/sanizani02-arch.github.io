@@ -1,114 +1,35 @@
-<!DOCTYPE html>
-<html lang="ku" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>کویزڵاند | ١٠٠ پرسیاری لۆژیک و مێژوو</title>
-    <style>
-        :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-color: #f8fafc;
-            --accent-color: #3b82f6;
-            --accent-hover: #2563eb;
-            --correct-color: #10b981;
-            --incorrect-color: #ef4444;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            background-color: var(--card-bg);
-            border-radius: 16px;
-            padding: 30px;
-            width: 100%;
-            max-width: 650px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            text-align: center;
-        }
-
-        h1 { color: var(--accent-color); margin-bottom: 20px; }
-
-        .menu-btn, .answer-btn, .next-btn {
-            width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.1rem;
-            font-weight: bold;
-            transition: all 0.2s ease;
-            background-color: var(--accent-color);
-            color: white;
-        }
-
-        .answer-btn { background-color: #334155; text-align: right; }
-        .correct { background-color: var(--correct-color) !important; }
-        .incorrect { background-color: var(--incorrect-color) !important; }
-        .hide { display: none; }
-        #question-text { font-size: 1.3rem; margin-bottom: 25px; line-height: 1.6; }
-    </style>
-</head>
-<body>
-
-    <div class="container">
-        <div id="menu-screen">
-            <h1>کویزڵاند</h1>
-            <button class="menu-btn" onclick="startQuiz('logic')">لۆژیک و مەتەڵ (٥٠ پرسیار)</button>
-            <button class="menu-btn" onclick="startQuiz('kurdish')">مێژووی کوردستان (٥٠ پرسیار)</button>
-        </div>
-
-        <div id="quiz-screen" class="hide">
-            <div id="question-counter"></div>
-            <div id="question-text"></div>
-            <div id="answer-buttons"></div>
-            <button id="next-btn" class="next-btn hide" onclick="nextQuestion()">پرسیاری داهاتوو</button>
-        </div>
-
-        <div id="result-screen" class="hide">
-            <h1>کۆتایی تاقیکردنەوەکە</h1>
-            <div id="score-display" style="margin: 20px 0; font-size: 1.5rem;"></div>
-            <button class="menu-btn" onclick="location.reload()">گەڕانەوە بۆ سەرەتا</button>
-        </div>
+<div class="container">
+    <div id="menu-screen">
+        <!-- سەردێڕ زیادکرا -->
+        <h1 style="color: #3b82f6;">جەنگی مێشک</h1>
+        <p style="margin-bottom: 25px; color: #94a3b8;">گرێکوێرەکانی لۆژیک و مێژوو</p>
+        
+        <button class="menu-btn" onclick="startQuiz('logic')">لۆژیک و مەتەڵ</button>
+        <button class="menu-btn" onclick="startQuiz('kurdish')">مێژووی کوردستان</button>
     </div>
+    <!-- باقی بەشەکانی تر وەک خۆی بمێنێتەوە -->
+</div>
 
-    <script>
-        // داتای کویزەکە لێرەدا دەبێت
-        const quizData = {
-            logic: [ /* ٥٠ پرسیاری لۆژیک */ ],
-            kurdish: [ /* ٥٠ پرسیاری مێژووی کوردستان */ ]
-        };
-        
-        // لۆجیکی جێبەجێکردنی کویزەکە لێرەدا دەنووسرێت
-        let currentCategory = '';
-        let currentQuestionIndex = 0;
-        let score = 0;
+<script>
+    // ... لە ناو بەشی startQuiz یان showQuestion ئەم بەشە زیاد بکە بۆ تێکەڵکردنی وەڵامەکان:
+    function showQuestion() {
+        resetState();
+        const currentQuestion = quizData[currentCategory][currentQuestionIndex];
+        document.getElementById('question-text').innerText = currentQuestion.question;
 
-        function startQuiz(category) {
-            currentCategory = category;
-            document.getElementById('menu-screen').classList.add('hide');
-            document.getElementById('quiz-screen').classList.remove('hide');
-            showQuestion();
-        }
+        // تێکەڵکردنی وەڵامەکان بە شێوەی هەڕەمەکی
+        const shuffledAnswers = currentQuestion.answers.sort(() => Math.random() - 0.5);
 
-        function showQuestion() {
-            const currentQuestion = quizData[currentCategory][currentQuestionIndex];
-            document.getElementById('question-text').innerText = currentQuestion.question;
-            // دروستکردنی دوگمەی وەڵامەکان...
-        }
-        
-        function nextQuestion() { /* بەشی پرسیاری داهاتوو */ }
-    </script>
-</body>
-</html>
+        shuffledAnswers.forEach(answer => {
+            const button = document.createElement('button');
+            button.innerText = answer.text;
+            button.classList.add('answer-btn');
+            if (answer.correct) {
+                button.dataset.correct = answer.correct;
+            }
+            button.addEventListener('click', selectAnswer);
+            document.getElementById('answer-buttons').appendChild(button);
+        });
+    }
+    // ...
+</script>

@@ -5,16 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>جەنگی مێشک</title>
     <style>
-        /* ستایلی گشتی و پاشبنەمای ڕەشی شاهانە لەگەڵ نەخشەی کوردستان */
+        /* دیزاینی نوێ: پاشبنەمایەکی گەش، مۆدێرن و پڕ لە وزە */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0b0c10;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" opacity="0.06" fill="%23ffffff"><path d="M420,180 Q460,150 510,130 T620,110 T710,150 T780,210 T830,290 T790,380 T680,440 T580,490 T490,520 T410,480 T350,420 T280,390 T210,350 T190,290 T260,230 T340,200 Z"/></svg>');
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: contain;
-            background-attachment: fixed;
-            color: #c5c6c7;
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            color: #2c3e50;
             margin: 0;
             padding: 20px;
             display: flex;
@@ -23,97 +18,107 @@
             min-height: 100vh;
         }
 
+        /* کارتێکی پرۆفیشناڵ کە چۆڵایی و سادەیی تێدا نەماوە */
         .quiz-container {
-            background-color: rgba(31, 40, 51, 0.9);
-            border-radius: 15px;
-            padding: 35px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-            max-width: 600px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 24px;
+            padding: 45px 35px;
+            box-shadow: 0 20px 40px rgba(44, 62, 80, 0.15);
+            max-width: 500px;
             width: 100%;
             text-align: center;
-            border: 1px solid #45f3ff;
-            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-sizing: border-box;
         }
 
         h1 {
-            color: #45f3ff;
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 0 0 10px rgba(69, 243, 255, 0.3);
+            color: #1a365d;
+            font-size: 3rem;
+            margin: 0 0 15px 0;
+            font-weight: 800;
+            letter-spacing: -0.5px;
         }
 
-        /* بۆشایی و دەقی بەخێرهاتنی نوێ */
+        /* ڕێکخستنی دەقی بەخێرهاتن بۆ دروستکردنی هاوسەنگی */
         .welcome-text {
-            font-size: 1.2rem;
-            margin-top: 5px;
-            margin-bottom: 40px; /* جێهێشتنی بۆشایی نایاب */
-            color: #9aa0a6;
-            line-height: 1.6;
+            font-size: 1.35rem;
+            margin: 0 0 40px 0;
+            color: #64748b;
+            font-weight: 600;
         }
 
+        /* دوگمەیەکی پڕ و سەرنجڕاکێش بۆ نەهێشتنی چۆڵایی کارتەکە */
         .btn {
-            background-color: #1f2833;
-            color: #45f3ff;
-            border: 2px solid #45f3ff;
-            padding: 15px 30px;
-            font-size: 1.2rem;
-            border-radius: 8px;
+            background: linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%);
+            color: #ffffff;
+            border: none;
+            padding: 18px 35px;
+            font-size: 1.3rem;
+            border-radius: 14px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             width: 100%;
-            margin: 10px 0;
+            margin: 15px 0 0 0;
             font-weight: bold;
+            box-shadow: 0 6px 20px rgba(49, 130, 206, 0.3);
         }
 
         .btn:hover {
-            background-color: #45f3ff;
-            color: #0b0c10;
-            box-shadow: 0 0 15px rgba(69, 243, 255, 0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(49, 130, 206, 0.45);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
         }
 
         .options-container {
             margin: 30px 0;
         }
 
+        /* ستایلی دوگمەی وەڵامەکان لە نێو لاپەڕەی پرسیاردا */
         .option-btn {
-            background-color: #1f2833;
-            color: #c5c6c7;
-            border: 1px solid #c5c6c7;
-            padding: 12px;
+            background-color: #ffffff;
+            color: #334155;
+            border: 2px solid #e2e8f0;
+            padding: 16px 20px;
             width: 100%;
-            margin: 8px 0;
-            border-radius: 6px;
+            margin: 12px 0;
+            border-radius: 12px;
             cursor: pointer;
             text-align: right;
-            font-size: 1.1rem;
-            transition: 0.2s;
+            font-size: 1.15rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
         }
 
         .option-btn:hover {
-            border-color: #45f3ff;
-            color: #45f3ff;
-            background-color: rgba(69, 243, 255, 0.05);
+            border-color: #3182ce;
+            background-color: #f7fafc;
+            color: #2b6cb0;
+            transform: translateX(-3px);
         }
 
         .hide {
             display: none;
         }
 
+        /* دوگمەی دواتر بە ڕەنگی سەوزی زیندوو */
         #next-btn {
-            background-color: #66fcf1;
-            color: #0b0c10;
-            border: none;
+            background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+            box-shadow: 0 6px 20px rgba(56, 161, 105, 0.3);
         }
 
         #next-btn:hover {
-            background-color: #45f3ff;
-            box-shadow: 0 0 15px rgba(102, 252, 241, 0.6);
+            box-shadow: 0 10px 25px rgba(56, 161, 105, 0.45);
         }
 
         .score-text {
-            font-size: 1.5rem;
-            color: #66fcf1;
-            margin-bottom: 20px;
+            font-size: 1.7rem;
+            color: #2f855a;
+            margin-bottom: 30px;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -129,9 +134,9 @@
 
         <!-- لاپەڕەی پرسیارەکان -->
         <div id="quiz-page" class="hide">
-            <h2 id="question" style="color: #ffffff; margin-bottom: 20px;">پرسیار لێرە دەردەکەوێت</h2>
+            <h2 id="question" style="color: #1a365d; margin-bottom: 30px; font-size: 1.5rem; line-height: 1.5;">پرسیار لێرە دەردەکەوێت</h2>
             <div id="options" class="options-container"></div>
-            <button id="next-btn" class="btn hide" onclick="nextQuestion()">دوواتر</button>
+            <button id="next-btn" class="btn hide" onclick="nextQuestion()">دواتر</button>
         </div>
 
         <!-- لاپەڕەی ئەنجام -->
@@ -149,7 +154,7 @@
                 answers: [
                     { text: "٥٠٪", correct: true },
                     { text: "٣٣.٣٪", correct: false },
-                    { text: "١00٪", correct: false },
+                    { text: "١٠٠٪", correct: false },
                     { text: "٢٥٪", correct: false }
                 ]
             },
@@ -214,17 +219,20 @@
             const isCorrect = selectedBtn.dataset.correct === "true";
             if (isCorrect) {
                 score++;
-                selectedBtn.style.backgroundColor = "#2e7d32";
+                selectedBtn.style.backgroundColor = "#48bb78";
+                selectedBtn.style.borderColor = "#48bb78";
                 selectedBtn.style.color = "#ffffff";
             } else {
-                selectedBtn.style.backgroundColor = "#c62828";
+                selectedBtn.style.backgroundColor = "#f56565";
+                selectedBtn.style.borderColor = "#f56565";
                 selectedBtn.style.color = "#ffffff";
             }
             
             Array.from(document.getElementById('options').children).forEach(button => {
                 button.disabled = true;
                 if(button.dataset.correct === "true") {
-                    button.style.backgroundColor = "#2e7d32";
+                    button.style.backgroundColor = "#48bb78";
+                    button.style.borderColor = "#48bb78";
                     button.style.color = "#ffffff";
                 }
             });

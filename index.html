@@ -71,7 +71,7 @@
             background: linear-gradient(135deg, #f3cd46 0%, #c49a24 100%);
         }
 
-        /* دوگمەی کاتۆگۆرییەکان بە ستایلی ناو-خاڵی زێڕین */
+        /* دوگمەی بەشەکان بە ستایلی زێڕین */
         .category-btn {
             background: transparent;
             color: #d4af37;
@@ -155,9 +155,9 @@
             <button class="btn" onclick="showCategories()">دەستپێکردن</button>
         </div>
 
-        <!-- لاپەڕەی هەڵبژاردنی کاتۆگۆری -->
+        <!-- لاپەڕەی هەڵبژاردنی بەشەکان -->
         <div id="category-page" class="hide">
-            <h2 style="color: #d4af37; margin-bottom: 25px;">کاتۆگۆرییەک هەڵبژێره</h2>
+            <h2 style="color: #d4af37; margin-bottom: 25px;">بەشێک هەڵبژێره</h2>
             <button class="category-btn" onclick="startQuiz('logic')">گرێکوێرەکانی لۆژیک</button>
             <button class="category-btn" onclick="startQuiz('kurdish')">مێژووی کوردستان</button>
             <button class="category-btn" onclick="startQuiz('world')">مێژووی جیهان</button>
@@ -165,7 +165,7 @@
 
         <!-- لاپەڕەی پرسیارەکان -->
         <div id="quiz-page" class="hide">
-            <h2 id="question" style="color: #ffffff; margin-bottom: 30px; font-size: 1.5rem; line-height: 1.5;">پرسیار لێرە دەردەکەوێت</h2>
+            <h2 id="question" style="color: #ffffff; margin-bottom: 30px; font-size: 1.5rem; line-height: 1.5;">پرسیار لێرەدا دەردەکەوێت</h2>
             <div id="options" class="options-container"></div>
             <button id="next-btn" class="btn hide" onclick="nextQuestion()">دواتر</button>
         </div>
@@ -211,7 +211,7 @@
                     ]
                 },
                 {
-                    question: "مێژووی کوردستان: یەکەم ڕۆژنامەی کوردی (ڕۆژنامەی کوردستان) لە چ شارێک دەرچوو؟",
+                    question: "مێژووی کوردستان: یەکەم ڕۆژنامەی کوردی (ڕۆژنامەی کوردستان) لە چ شارێکدا دەرچوو؟",
                     answers: [
                         { text: "قاھیرە", correct: true },
                         { text: "ئەستەمبوڵ", correct: false },
@@ -222,7 +222,7 @@
             ],
             world: [
                 {
-                    question: "مێژووی جیهان: شۆڕشی فەڕەنسا لە چ ساڵێکدا بەرپابوو؟",
+                    question: "مێژووی جیهان: شۆڕشی فەڕەنسا لە چ ساڵێکدا بەرپا بوو؟",
                     answers: [
                         { text: "١٧٨٩", correct: true },
                         { text: "١٦٨٩", correct: false },

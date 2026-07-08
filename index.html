@@ -18,9 +18,9 @@
             min-height: 100vh;
         }
 
-        /* کارتێکی پرۆفیشناڵ کە چۆڵایی و سادەیی تێدا نەماوە */
+        /* کارتی سەرەکی کویزەکە */
         .quiz-container {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 24px;
             padding: 45px 35px;
             box-shadow: 0 20px 40px rgba(44, 62, 80, 0.15);
@@ -39,7 +39,6 @@
             letter-spacing: -0.5px;
         }
 
-        /* ڕێکخستنی دەقی بەخێرهاتن بۆ دروستکردنی هاوسەنگی */
         .welcome-text {
             font-size: 1.35rem;
             margin: 0 0 40px 0;
@@ -47,7 +46,7 @@
             font-weight: 600;
         }
 
-        /* دوگمەیەکی پڕ و سەرنجڕاکێش بۆ نەهێشتنی چۆڵایی کارتەکە */
+        /* دوگمە سەرەکییەکان */
         .btn {
             background: linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%);
             color: #ffffff;
@@ -68,15 +67,33 @@
             box-shadow: 0 10px 25px rgba(49, 130, 206, 0.45);
         }
 
-        .btn:active {
-            transform: translateY(-1px);
+        /* دوگمەی کاتۆگۆرییەکان */
+        .category-btn {
+            background: #ffffff;
+            color: #2b6cb0;
+            border: 2px solid #3182ce;
+            padding: 16px;
+            font-size: 1.2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            margin: 12px 0;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .category-btn:hover {
+            background: linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(49, 130, 206, 0.2);
         }
 
         .options-container {
             margin: 30px 0;
         }
 
-        /* ستایلی دوگمەی وەڵامەکان لە نێو لاپەڕەی پرسیاردا */
+        /* دوگمەی وەڵامەکان */
         .option-btn {
             background-color: #ffffff;
             color: #334155;
@@ -104,7 +121,6 @@
             display: none;
         }
 
-        /* دوگمەی دواتر بە ڕەنگی سەوزی زیندوو */
         #next-btn {
             background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
             box-shadow: 0 6px 20px rgba(56, 161, 105, 0.3);
@@ -129,7 +145,15 @@
         <div id="start-page">
             <h1>جەنگی مێشک</h1>
             <p class="welcome-text">گرێکوێرەکانی لۆژیک و مێژوو</p>
-            <button class="btn" onclick="startQuiz()">دەستپێکردن</button>
+            <button class="btn" onclick="showCategories()">دەستپێکردن</button>
+        </div>
+
+        <!-- لاپەڕەی هەڵبژاردنی کاتۆگۆری -->
+        <div id="category-page" class="hide">
+            <h2 style="color: #1a365d; margin-bottom: 25px;">کاتۆگۆرییەک هەڵبژێره</h2>
+            <button class="category-btn" onclick="startQuiz('logic')">گرێکوێرەکانی لۆژیک</button>
+            <button class="category-btn" onclick="startQuiz('kurdish')">مێژووی کوردستان</button>
+            <button class="category-btn" onclick="startQuiz('world')">مێژووی جیهان</button>
         </div>
 
         <!-- لاپەڕەی پرسیارەکان -->
@@ -148,42 +172,85 @@
     </div>
 
     <script>
-        const questions = [
-            {
-                question: "کێشەیەکی لۆژیکی: سێ کلیل هەن و تەنها یەکێکیان دەرگاکە دەکاتەوە، ئەگەر یەکەم کلیل تاقی بکەیتەوە و نەبێت، چانسی کلیلەکەی تر چەندە؟",
-                answers: [
-                    { text: "٥٠٪", correct: true },
-                    { text: "٣٣.٣٪", correct: false },
-                    { text: "١٠٠٪", correct: false },
-                    { text: "٢٥٪", correct: false }
-                ]
-            },
-            {
-                question: "مێژوو: ئیمپراتۆریەتی میدیا لە چ سەدەیەکدا دامەزرا؟",
-                answers: [
-                    { text: "سەدەی حەوتمی پێش زایین", correct: true },
-                    { text: "سەدەی پێنجەمی پێش زایین", correct: false },
-                    { text: "سەدەی یەکەمی زایینی", correct: false },
-                    { text: "سەدەی دەیەمی پێش زایین", correct: false }
-                ]
-            },
-            {
-                question: "لۆژیک: شتێک هەیە هەمیشە دێت بەڵام قەت ناگات، ئەو شتە چییە؟",
-                answers: [
-                    { text: "بەیانی (داهاتوو)", correct: true },
-                    { text: "دوێنێ", correct: false },
-                    { text: "سێبەر", correct: false },
-                    { text: "تەمەن", correct: false }
-                ]
-            }
-        ];
+        // بانکێکی ڕێکخراو بۆ پرسیارەکان بەپێی کاتۆگۆری
+        const quizData = {
+            logic: [
+                {
+                    question: "کێشەیەکی لۆژیکی: سێ کلیل هەن و تەنها یەکێکیان دەرگاکە دەکاتەوە، ئەگەر یەکەم کلیل تاقی بکەیتەوە و نەبێت، چانسی کلیلەکەی تر چەندە؟",
+                    answers: [
+                        { text: "٥٠٪", correct: true },
+                        { text: "٣٣.٣٪", correct: false },
+                        { text: "١٠٠٪", correct: false },
+                        { text: "٢٥٪", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: شتێک هەیە هەمیشە دێت بەڵام قەت ناگات، ئەو شتە چییە؟",
+                    answers: [
+                        { text: "بەیانی (داهاتوو)", correct: true },
+                        { text: "دوێنێ", correct: false },
+                        { text: "سێبەر", correct: false },
+                        { text: "تەمەن", correct: false }
+                    ]
+                }
+            ],
+            kurdish: [
+                {
+                    question: "مێژوو: ئیمپراتۆریەتی میدیا لە چ سەدەیەکدا دامەزرا؟",
+                    answers: [
+                        { text: "سەدەی حەوتمی پێش زایین", correct: true },
+                        { text: "سەدەی پێنجەمی پێش زایین", correct: false },
+                        { text: "سەدەی یەکەمی زایینی", correct: false },
+                        { text: "سەدەی دەیەمی پێش زایین", correct: false }
+                    ]
+                },
+                {
+                    question: "مێژووی کوردستان: یەکەم ڕۆژنامەی کوردی (ڕۆژنامەی کوردستان) لە چ شارێک دەرچوو؟",
+                    answers: [
+                        { text: "قاھیرە", correct: true },
+                        { text: "ئەستەمبوڵ", correct: false },
+                        { text: "بەغداد", correct: false },
+                        { text: "مەهاباد", correct: false }
+                    ]
+                }
+            ],
+            world: [
+                {
+                    question: "مێژووی جیهان: شۆڕشی فەڕەنسا لە چ ساڵێکدا بەرپابوو؟",
+                    answers: [
+                        { text: "١٧٨٩", correct: true },
+                        { text: "١٦٨٩", correct: false },
+                        { text: "١٨٨٩", correct: false },
+                        { text: "١٩٠٢", correct: false }
+                    ]
+                },
+                {
+                    question: "مێژووی جیهان: کام شارستانییەت یەکەم پیت و نووسینی (بزماری) داهێنا؟",
+                    answers: [
+                        { text: "سۆمەرییەکان", correct: true },
+                        { text: "فیرعەونەکان", correct: false },
+                        { text: "ڕۆمانییەکان", correct: false },
+                        { text: "گریکییەکان", correct: false }
+                    ]
+                }
+            ]
+        };
 
+        let currentQuestions = [];
         let currentQuestionIndex = 0;
         let score = 0;
 
-        function startQuiz() {
+        function showCategories() {
             document.getElementById('start-page').classList.add('hide');
+            document.getElementById('category-page').classList.remove('hide');
+        }
+
+        function startQuiz(category) {
+            document.getElementById('category-page').classList.add('hide');
             document.getElementById('quiz-page').classList.remove('hide');
+            
+            // دیاریکردنی پرسیارەکانی ئەو کاتۆگۆرییەی هەڵبژێردراوە
+            currentQuestions = quizData[category];
             currentQuestionIndex = 0;
             score = 0;
             showQuestion();
@@ -191,7 +258,7 @@
 
         function showQuestion() {
             resetState();
-            let currentQuestion = questions[currentQuestionIndex];
+            let currentQuestion = currentQuestions[currentQuestionIndex];
             document.getElementById('question').innerText = currentQuestion.question;
 
             currentQuestion.answers.forEach(answer => {
@@ -242,7 +309,7 @@
 
         function nextQuestion() {
             currentQuestionIndex++;
-            if (currentQuestionIndex < questions.length) {
+            if (currentQuestionIndex < currentQuestions.length) {
                 showQuestion();
             } else {
                 showResult();
@@ -252,12 +319,12 @@
         function showResult() {
             document.getElementById('quiz-page').classList.add('hide');
             document.getElementById('result-page').classList.remove('hide');
-            document.getElementById('score-display').innerText = `تۆ لە کۆی ${questions.length} پرسیار، ${score} وەڵامت ڕاست بوو!`;
+            document.getElementById('score-display').innerText = `تۆ لە کۆی ${currentQuestions.length} پرسیار، ${score} وەڵامت ڕاست بوو!`;
         }
 
         function restartQuiz() {
             document.getElementById('result-page').classList.add('hide');
-            document.getElementById('start-page').classList.remove('hide');
+            document.getElementById('category-page').classList.remove('hide');
         }
     </script>
 </body>

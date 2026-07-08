@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جەنگی مێشک | پرسیاری لۆژیک و مێژوو</title>
+    <title>کویزڵاند | ١٠٠ پرسیاری لۆژیک و مێژوو</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -102,43 +102,29 @@
 
     <div class="container">
         <!-- دەستپێک / مینیو -->
-        <!DOCTYPE html>
-<html lang="ku" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <title>جه‌نگی مێشک</title>
-    <style>
-        body { background-color: #0f172a; color: #f8fafc; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { background-color: #1e293b; padding: 25px; border-radius: 16px; width: 90%; max-width: 450px; text-align: center; }
-        .btn { background-color: #3b82f6; color: white; border: none; padding: 15px; margin: 10px 0; width: 100%; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: bold; }
-        .hidden { display: none; }
-    </style>
-</head>
-<body>
-    <div class="container" id="menu">
-        <h1>جه‌نگی مێشک</h1>
-        <p>به‌شێک هه‌ڵبژێره‌:</p>
-        <button class="btn" onclick="showQuiz()">لۆژیک و مەتەڵ</button>
-        <button class="btn" onclick="showQuiz()">مێژووی کوردستان</button>
+        <div id="menu-screen">
+            <h1>کویزڵاند</h1>
+            <p style="margin-bottom: 25px; color: #94a3b8;">بەشێک هەڵبژێره بۆ دەستپێکردنی تاقیکردنەوەکە:</p>
+            <button class="menu-btn" onclick="startQuiz('logic')">لۆژیک و مەتەڵ (٥٠ پرسیار)</button>
+            <button class="menu-btn" onclick="startQuiz('kurdish')">مێژووی کوردستان (٥٠ پرسیار)</button>
+            <button class="menu-btn" onclick="startQuiz('world')">مێژووی جیهان (بەم زووانە)</button>
+        </div>
+
+        <!-- شاشەی پرسیارەکان -->
+        <div id="quiz-screen" class="hide">
+            <div id="question-counter">پرسیار</div>
+            <div id="question-text">لێرە پرسیارەکە پیشان دەدرێت</div>
+            <div id="answer-buttons"></div>
+            <button id="next-btn" class="next-btn hide" onclick="nextQuestion()">پرسیاری داهاتوو</button>
+        </div>
+
+        <!-- شاشەی کۆتایی و ئەنجام -->
+        <div id="result-screen" class="hide">
+            <h1>کۆتایی تاقیکردنەوەکە</h1>
+            <div class="score-text" id="score-display"></div>
+            <button class="menu-btn" onclick="showMenu()">گەڕانەوە بۆ سەرەتا</button>
+        </div>
     </div>
-
-    <div class="container hidden" id="quiz">
-        <h2 id="q-text">پرسیار لێرە دەبێت</h2>
-        <div id="a-btns"></div>
-    </div>
-
-    <script>
-        function showQuiz() {
-            document.getElementById('menu').classList.add('hidden');
-            document.getElementById('quiz').classList.remove('hidden');
-            document.getElementById('q-text').innerText = "پرسیاری تاقیکردنەوە...";
-            // لێرە دەتوانیت لۆژیکی پرسیارەکان زیاد بکەیت
-        }
-    </script>
-</body>
-</html>
-
-
 
     <script>
         const quizData = {
@@ -594,62 +580,11 @@
                     ]
                 }
             ],
-            {q: "کامە مانگ ٢٨ ڕۆژی هەیە؟", a: [{t: "هەموو مانگەکان", c: true}, {t: "تەنها شوبات", c: false}, {t: "مانگی ئادار", c: false}]},
-{q: "ئەو شتەی خاوەنەکەی بەکاری ناهێنێت و کڕیارەکەشی نایبینێت، چییە؟", a: [{t: "تابووت", c: true}, {t: "پێڵاو", c: false}, {t: "جل", c: false}]},
-{q: "ئەو پیتەی لە ناوەڕاستی 'کوردستان'دایە کامەیە؟", a: [{t: "س", c: true}, {t: "ر", c: false}, {t: "د", c: false}]},
-{q: "چییە کە بە قاچ دەڕوات و سەری نییە؟", a: [{t: "کاتژمێر", c: true}, {t: "مێز", c: false}, {t: "کورسی", c: false}]},
-{q: "ئەگەر سێ سێو هەبێت و دووانی لێ ببەیت، چەنت لایە؟", a: [{t: "دوو", c: true}, {t: "سێ", c: false}, {t: "یەک", c: false}]},
-{q: "چییە کە بەرز دەبێتەوە بەڵام هەرگیز دانابەزێت؟", a: [{t: "تەمەن", c: true}, {t: "بالۆن", c: false}, {t: "باران", c: false}]},
-{q: "چییە کە بۆشایی زۆرە بەڵام هەموو شتێکی تێدایە؟", a: [{t: "سپەنج", c: true}, {t: "سندوق", c: false}, {t: "کیسە", c: false}]},
-{q: "چییە کە ناوەکەی وشکە بەڵام لە ئاودا دەژیت؟", a: [{t: "سەهۆڵ", c: true}, {t: "ماسی", c: false}, {t: "چەتر", c: false}]},
-{q: "چییە کە بەسەریدا دەڕۆین و قەت ناڕەنجێت؟", a: [{t: "شەقام", c: true}, {t: "دار", c: false}, {t: "گژوگیا", c: false}]},
-{q: "چییە کە هەموو کەسێک بەکاری دەهێنێت بەڵام ناتوانێت بیبینێت؟", a: [{t: "هەوا", c: true}, {t: "ئاو", c: false}, {t: "خۆر", c: false}]},
-{q: "بۆچی ماسی لەناو ئاودایە؟", a: [{t: "چونکە ئاوی پێویستە", c: true}, {t: "چونکە مەلە دەزانێت", c: false}, {t: "چونکە خۆی وایە", c: false}]},
-{q: "چییە کە قسە ناکات بەڵام هەموو شتێک دەڵێت؟", a: [{t: "کتێب", c: true}, {t: "ڕادیۆ", c: false}, {t: "تەلەفزیۆن", c: false}]},
-{q: "چییە کە کاتێک پاکە ڕەشە، کاتێک پیسە سپییە؟", a: [{t: "تەختەی ڕەش", c: true}, {t: "پەڕاو", c: false}, {t: "جل", c: false}]},
-{q: "چییە کە هەردوو دەستی هەیە بەڵام دەست بە شت ناکات؟", a: [{t: "کاتژمێر", c: true}, {t: "قاپ", c: false}, {t: "پەیکەر", c: false}]},
-{q: "چییە کە بە پەنجە ڕادەگیرێت و بە دەم دەکرێتەوە؟", a: [{t: "دەرگا", c: true}, {t: "پاکەت", c: false}, {t: "جانتا", c: false}]},
-{q: "چییە کە ئەگەر بیدەیت بە کەسێک لای خۆت نامێنێت؟", a: [{t: "قسە", c: true}, {t: "پارە", c: false}, {t: "بڕوا", c: false}]},
-{q: "بۆچی باڵندە لە زستاندا دەفڕێت بۆ باشوور؟", a: [{t: "چونکە دوورە", c: true}, {t: "چونکە حەزی لێیە", c: false}, {t: "چونکە تەمەڵە", c: false}]},
-{q: "چییە کە لەناو ئاودایە و تەڕ نابێت؟", a: [{t: "سێبەر", c: true}, {t: "بەرد", c: false}, {t: "ماسی", c: false}]},
-{q: "چییە کە بەرزترین شتە لە جیهاندا؟", a: [{t: "چیای ئێڤەرست", c: true}, {t: "مانگ", c: false}, {t: "خۆر", c: false}]},
-{q: "چییە کە بە کات دەڕوات و ناگەڕێتەوە؟", a: [{t: "کات", c: true}, {t: "ڕۆژ", c: false}, {t: "مانگ", c: false}]},
-{q: "چییە کە بە هەموو زمانێک قسە دەکات؟", a: [{t: "دژە دەنگ", c: true}, {t: "مۆسیقا", c: false}, {t: "وێنە", c: false}]},
-{q: "چییە کە سەری هەیە و لاشەی نییە؟", a: [{t: "مێخ", c: true}, {t: "پێنووس", c: false}, {t: "کەڵەباب", c: false}]},
-{q: "چییە کە تەنها لە شەودا دەردەکەوێت؟", a: [{t: "ئەستێرە", c: true}, {t: "خۆر", c: false}, {t: "هەور", c: false}]},
-{q: "چییە کە بە درێژایی ڕۆژ دەسوڕێتەوە و ناوەستێت؟", a: [{t: "زەوی", c: true}, {t: "مانگ", c: false}, {t: "ئەستێرە", c: false}]},
-{q: "چییە کە لە ئاگردا دەسووتێت و لە ئاودا دەمرێت؟", a: [{t: "ئاگر", c: true}, {t: "دار", c: false}, {t: "کاغەز", c: false}]},
-{q: "چییە کە بە هەموو شتێکدا تێپەڕ دەبێت و شوێنەواری نامێنێت؟", a: [{t: "ڕووناکی", c: true}, {t: "دەنگ", c: false}, {t: "با", c: false}]},
-{q: "چییە کە هەموو ڕۆژێک لە دایک دەبێت و هەرگیز نامرێت؟", a: [{t: "ڕۆژ", c: true}, {t: "مانگ", c: false}, {t: "ساڵ", c: false}]},
-{q: "چییە کە هەردوو چاوی هەیە بەڵام نابینێت؟", a: [{t: "دەرزی", c: true}, {t: "پەیکەر", c: false}, {t: "بووکەشووشە", c: false}]},
-{q: "چییە کە کاتێک دەیشۆیت پیس دەبێت؟", a: [{t: "ئاو", c: true}, {t: "سەهۆڵ", c: false}, {t: "لێت", c: false}]},
-{q: "چییە کە بە قسەکردن دەشکێت؟", a: [{t: "بێدەنگی", c: true}, {t: "کوشتار", c: false}, {t: "هاوڕێیەتی", c: false}]},
-{q: "چییە کە خاوەنەکەی دەیناسێت بەڵام کەسانی تر نا؟", a: [{t: "دەنگ", c: true}, {t: "ناو", c: false}, {t: "ڕوخسار", c: false}]},
-{q: "چییە کە بە کات دەگۆڕێت بەڵام لە بنەڕەتدا وەک خۆیەتی؟", a: [{t: "مرۆڤ", c: true}, {t: "دار", c: false}, {t: "بەرد", c: false}]},
-{q: "چییە کە بە دڵ دەبینرێت نەک بە چاو؟", a: [{t: "خۆشەویستی", c: true}, {t: "ڕق", c: false}, {t: "خەم", c: false}]},
-{q: "چییە کە لە هەموو شوێنێک هەیە و نابینرێت؟", a: [{t: "هەوا", c: true}, {t: "ئاو", c: false}, {t: "گەرما", c: false}]},
-{q: "چییە کە بە تەمەن گەورە دەبێت بەڵام بچووک دەردەکەوێت؟", a: [{t: "تەمەن", c: true}, {t: "مێشک", c: false}, {t: "ژیر", c: false}]},
-{q: "چییە کە بە تەنها دەست پێ دەکات و بە کۆمەڵ کۆتایی دێت؟", a: [{t: "شەڕ", c: true}, {t: "ئاشتی", c: false}, {t: "ژیان", c: false}]},
-{q: "چییە کە بە ئاسانی بەدەست دێت و بە سەختی لە دەست دەچێت؟", a: [{t: "بیرەوەری", c: true}, {t: "پارە", c: false}, {t: "کات", c: false}]},
-{q: "چییە کە بە شەو دەبێتە ڕۆژ؟", a: [{t: "خەون", c: true}, {t: "مۆم", c: false}, {t: "تاریکی", c: false}]},
-{q: "چییە کە هەموو کەسێک هەڵی دەگرێت بەڵام کەس ناتوانێت بەشێکی کەم بکات؟", a: [{t: "ناونیشان", c: true}, {t: "تەمەن", c: false}, {t: "بار", c: false}]},
-{q: "چییە کە کاتێک بەکار دەهێنرێت کۆن دەبێت؟", a: [{t: "پێڵاو", c: true}, {t: "جل", c: false}, {t: "کتێب", c: false}]},
-{q: "چییە کە بە ڕاکردن دەگاتە مەبەست؟", a: [{t: "شەمەندەفەر", c: true}, {t: "ماشێن", c: false}, {t: "پیاو", c: false}]},
-{q: "چییە کە کاتێک دەگریت پێدەکەنێت؟", a: [{t: "بووکەشووشە", c: true}, {t: "منداڵ", c: false}, {t: "دڵ", c: false}]},
-{q: "چییە کە بە درێژی دەژیت و زوو دەمرێت؟", a: [{t: "گوڵ", c: true}, {t: "دار", c: false}, {t: "مرۆڤ", c: false}]},
-{q: "چییە کە هەموو کەسێک حەزی لێیەتی بەڵام نایەوێت بەکاری بهێنێت؟", a: [{t: "مردن", c: true}, {t: "نەخۆشی", c: false}, {t: "تەمەن", c: false}]},
-{q: "چییە کە بە پەنجە بەرز دەبێتەوە و بە چاو دادەبەزێت؟", a: [{t: "تەم", c: true}, {t: "هەور", c: false}, {t: "دووکەڵ", c: false}]},
-{q: "چییە کە لە هەموو کاتێکدا دەست پێ دەکات؟", a: [{t: "کات", c: true}, {t: "ڕۆژ", c: false}, {t: "ساڵ", c: false}]},
-{q: "چییە کە بە قسە دێت و بە کردەوە دەڕوات؟", a: [{t: "بەڵێن", c: true}, {t: "پارە", c: false}, {t: "کات", c: false}]},
-{q: "چییە کە لە ئاو دەترسێت؟", a: [{t: "کڵاو", c: true}, {t: "جل", c: false}, {t: "سەهۆڵ", c: false}]},
-{q: "چییە کە بەرز دەبێتەوە و کەس نایبینێت؟", a: [{t: "پلەی گەرمی", c: true}, {t: "با", c: false}, {t: "دەنگ", c: false}]},
-{q: "چییە کە لە هەموو کەسێک نزیکە و هەرگیز نابینرێت؟", a: [{t: "دڵ", c: true}, {t: "مێشک", c: false}, {t: "گیان", c: false}]}
-
             kurdish: [
                 {
                     question: "کوردستان: ئیمپراتۆریەتی میدیا لە چ سەدەیەکدا دامەزرا؟",
                     answers: [
-                        { text: "سەدەی حەوتەمی پێش زایین", correct: true },
+                        { text: "سەدەی حەوتمی پێش زایین", correct: true },
                         { text: "سەدەی پێنجەمی پێش زایین", correct: false },
                         { text: "سەدەی یەکەمی زایینی", correct: false },
                         { text: "سەدەی دەیەمی پێش زایین", correct: false }

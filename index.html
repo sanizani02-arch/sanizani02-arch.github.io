@@ -2,61 +2,1144 @@
 <html lang="ku" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>کویزڵاند | ١٠٠ پرسیار</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>کویزڵاند | ١٠٠ پرسیاری لۆژیک و مێژوو</title>
     <style>
-        :root { --bg: #0f172a; --card: #1e293b; --text: #fff; --blue: #3b82f6; --green: #10b981; --red: #ef4444; }
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
-        .container { background: var(--card); padding: 30px; border-radius: 16px; width: 100%; max-width: 600px; }
-        .btn { width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 8px; cursor: pointer; background: #334155; color: white; text-align: right; font-size: 1rem; }
-        .btn:hover { background: #475569; }
-        .correct { background: var(--green) !important; }
-        .incorrect { background: var(--red) !important; }
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-color: #3b82f6;
+            --accent-hover: #2563eb;
+            --correct-color: #10b981;
+            --incorrect-color: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            width: 100%;
+            max-width: 650px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--accent-color);
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+
+        .menu-btn, .answer-btn, .next-btn {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .menu-btn:hover, .next-btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .answer-btn {
+            background-color: #334155;
+            text-align: right;
+        }
+
+        .answer-btn:hover:not([disabled]) {
+            background-color: #475569;
+        }
+
+        .correct { background-color: var(--correct-color) !important; }
+        .incorrect { background-color: var(--incorrect-color) !important; }
+
         .hide { display: none; }
+        
+        #question-counter {
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        #question-text {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .score-text {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <div id="menu">
+        <!-- دەستپێک / مینیو -->
+        <div id="menu-screen">
             <h1>کویزڵاند</h1>
-            <button class="btn" onclick="start('logic')">لۆژیک و مەتەڵ (٥٠ پرسیار)</button>
-            <button class="btn" onclick="start('kurdish')">مێژووی کوردستان (٥٠ پرسیار)</button>
+            <p style="margin-bottom: 25px; color: #94a3b8;">بەشێک هەڵبژێره بۆ دەستپێکردنی تاقیکردنەوەکە:</p>
+            <button class="menu-btn" onclick="startQuiz('logic')">لۆژیک و مەتەڵ (٥٠ پرسیار)</button>
+            <button class="menu-btn" onclick="startQuiz('kurdish')">مێژووی کوردستان (٥٠ پرسیار)</button>
+            <button class="menu-btn" onclick="startQuiz('world')">مێژووی جیهان (بەم زووانە)</button>
         </div>
-        <div id="quiz" class="hide">
-            <h2 id="q-text"></h2>
-            <div id="a-btns"></div>
-            <button id="next-btn" class="btn" style="background:var(--blue)" onclick="next()">پرسیاری داهاتوو</button>
+
+        <!-- شاشەی پرسیارەکان -->
+        <div id="quiz-screen" class="hide">
+            <div id="question-counter">پرسیار</div>
+            <div id="question-text">لێرە پرسیارەکە پیشان دەدرێت</div>
+            <div id="answer-buttons"></div>
+            <button id="next-btn" class="next-btn hide" onclick="nextQuestion()">پرسیاری داهاتوو</button>
+        </div>
+
+        <!-- شاشەی کۆتایی و ئەنجام -->
+        <div id="result-screen" class="hide">
+            <h1>کۆتایی تاقیکردنەوەکە</h1>
+            <div class="score-text" id="score-display"></div>
+            <button class="menu-btn" onclick="showMenu()">گەڕانەوە بۆ سەرەتا</button>
         </div>
     </div>
+
     <script>
-        const data = {
+        const quizData = {
             logic: [
-                {q: "هێلکەیەک لە ٣ خولەکدا بکوڵێت، بۆ ٥ هێلکە چەند پێویستە؟", a: [{t: "٣ خولەک", c: true}, {t: "١٥ خولەک", c: false}, {t: "٥ خولەک", c: false}]},
-                {q: "شتێک هەیە هەمیشە دێت بەڵام قەت ناگات؟", a: [{t: "بەیانی", c: true}, {t: "دوێنێ", c: false}, {t: "تەمەن", c: false}]},
-                // لێرە ٤٨ پرسیاری تری لۆژیک دابنێ...
+                {
+                    question: "کێشەیەکی لۆژیکی: سێ کلیل هەن و تەنها یەکێکیان دەرگاکە دەکاتەوە، ئەگەر یەکەم کلیل تاقی بکەیتەوە و نەبێت، چانسی کلیلەکەی تر چەندە؟",
+                    answers: [
+                        { text: "٥٠٪", correct: true },
+                        { text: "٣٣.٣٪", correct: false },
+                        { text: "١٠٠٪", correct: false },
+                        { text: "٢٥٪", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: شتێک هەیە هەمیشە دێت بەڵام قەت ناگات، ئەو شتە چییە؟",
+                    answers: [
+                        { text: "بەیانی (داهاتوو)", correct: true },
+                        { text: "دوێنێ", correct: false },
+                        { text: "سێبەر", correct: false },
+                        { text: "تەمەن", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: باوکی کاروان ٥ کوڕی هەیە: یەکەم ناوی چیا، دووەم ناوی بڕوا، سێیەم ناوی هیوا، چوارەم ناوی هێمن. ناوی کوڕی پێنجەم چییە؟",
+                    answers: [
+                        { text: "کاروان", correct: true },
+                        { text: "ئاراس", correct: false },
+                        { text: "پشتیوان", correct: false },
+                        { text: "دانا", correct: false }
+                    ]
+                },
+                {
+                    question: "مەتەڵ: کێشەیەک کە تا زیاتری لێ ببەیت، گەورەتر دەبێت. ئەو شتە چییە؟",
+                    answers: [
+                        { text: "چاڵ", correct: true },
+                        { text: "پارە", correct: false },
+                        { text: "تەمەن", correct: false },
+                        { text: "کێشە", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: ئەگەر لە پێشبڕکێیەکی ڕاکردندا، بەرببیتەوە پێش کەسی دووەم، تۆ دەبیتە چەندەم？",
+                    answers: [
+                        { text: "دووەم", correct: true },
+                        { text: "یەکەم", correct: false },
+                        { text: "سێیەم", correct: false },
+                        { text: "کۆتا کاندید", correct: false }
+                    ]
+                },
+                {
+                    question: "مەتەڵ: شتێک هەیە هەمیشە پێش خۆت دەکەوێت بەڵام ناتوانیت بیگریت، ئەو شتە چییە؟",
+                    answers: [
+                        { text: "سێبەرەکەت", correct: true },
+                        { text: "با", correct: false },
+                        { text: "دەنگ", correct: false },
+                        { text: "هەناسە", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: ئەگەر هێلکەیەک لە ٣ خولەکدا بکوڵێت، چەند خولەک پێویستە بۆ کوڵاندنی ٥ هێلکە پێکەوە لە هەمان قاپدا؟",
+                    answers: [
+                        { text: "٣ خولەک", correct: true },
+                        { text: "١٥ خولەک", correct: false },
+                        { text: "٨ خولەک", correct: false },
+                        { text: "٥ خولەک", correct: false }
+                    ]
+                },
+                {
+                    question: "مەتەڵ: شتێک چییە کە دەتوانیت بە دەستی ڕاستت بیگریت، بەڵام قەت ناتوانیت بە دەستی چەپت بیگریت؟",
+                    answers: [
+                        { text: "ئەنیشکی چەپت", correct: true },
+                        { text: "پەنجەکانی دەستت", correct: false },
+                        { text: "قەڵەم", correct: false },
+                        { text: "مۆبایلەکەت", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: ژوورێک سێ گڵۆپی تێدایە و لە دەرەوەی ژوورەکە سێ سویچ هەیە. تەنها یەک جار بۆت هەیە بچیتە ژوورەوە. چۆن دەزانیت کام سویچ بۆ کام گڵۆپە؟",
+                    answers: [
+                        { text: "سویچێک دادەگیرسێنم و دوای ماوەیەک دەیکوژێنمەوە، دانەیەکی تر دادەگیرسێنم و دەچمە ژوورەوە", correct: true },
+                        { text: "سویچەکان بە خێرایی لێدەدەم", correct: false },
+                        { text: "مەحاڵە بزانرێت بێ ئامێر", correct: false },
+                        { text: "سەیری ژێر دەرگاکە دەکەم", correct: false }
+                    ]
+                },
+                {
+                    question: "مەتەڵ: ئەو شتە چییە کە هی خۆتە، بەڵام خەڵکی تر زیاتر لە خۆت بەکاری دەهێنن؟",
+                    answers: [
+                        { text: "ناوەکەت", correct: true },
+                        { text: "پێڵاوەکەت", correct: false },
+                        { text: "مۆبایلەکەت", correct: false },
+                        { text: "سەیارەکەت", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: پێنج مرۆڤ لە ژێر چەترێکی بچووکدا دەڕۆن، بەڵام هیچ کامیان تەڕ نابێت. بۆچی？",
+                    answers: [
+                        { text: "چونکە باران نابارێت", correct: true },
+                        { text: "چونکە چەترەکە جادووییە", correct: false },
+                        { text: "چونکە جلوبەرگی دژەبارانیان لەبەرە", correct: false },
+                        { text: "چونکە ڕادەکەن", correct: false }
+                    ]
+                },
+                {
+                    question: "مەتەڵ: شتێک هەیە ددانێکی زۆری هەیە بەڵام قەت گاز ناگرێت، ئەو شتە چییە؟",
+                    answers: [
+                        { text: "شاخە (شانە)", correct: true },
+                        { text: "مەشەرە", correct: false },
+                        { text: "مەقەس", correct: false },
+                        { text: "کلیل", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: دوو باوک و دوو کوڕ چوون بۆ ڕاو، سێ کەروێشکیان ڕاوکرد. هەر یەکێکیان کەروێشکێکی تەواوی بەرکەوت بێ ئەوەی پارچە بکرێت. چۆن ئەمە ڕوویدا؟",
+                    answers: [
+                        { text: "باپیر و باوک و کوڕ بوون (سێ کەس بوون)", correct: true },
+                        { text: "کەروێشکێکیان دزی", correct: false },
+                        { text: "چوار کەس بوون بەڵام یەکێکیان ڕاوی نەکرد", correct: false },
+                        { text: "مەتەڵەکە هەڵەیە", correct: false }
+                    ]
+                },
+                {
+                    question: "مەتەڵ: هەمیشە بە کلس و قسە پڕ دەبێتەوە، بەڵام قەت قسە ناکات، ئەو شتە چییە؟",
+                    answers: [
+                        { text: "کتێب", correct: true },
+                        { text: "ڕادیۆ", correct: false },
+                        { text: "دیوار", correct: false },
+                        { text: "مۆبایل", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: شەمەندەفەرێکی کارەبایی بەرەو باکوور دەڕوات، باکەش بەرەو باشوور دێت. دووکەڵی شەمەندەفەرەکە بەرەو کام لایەن دەڕوات؟",
+                    answers: [
+                        { text: "هیچ لایەک (شەمەندەفەری کارەبایی دووکەڵی نییە)", correct: true },
+                        { text: "باکوور", correct: false },
+                        { text: "باشوور", correct: false },
+                        { text: "ڕۆژهەڵات", correct: false }
+                    ]
+                },
+                {
+                    question: "مەتەڵ: من کێم؟ بە قسەکردن لەناو دەچم و دەشکێم.",
+                    answers: [
+                        { text: "بێدەنگی", correct: true },
+                        { text: "شوشە", correct: false },
+                        { text: "نهێنی", correct: false },
+                        { text: "خەون", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: پیاوێک لە ناو باراندا پیاسە دەکات بێ چەتر و کڵاو، جلەکانی تەواو تەڕ دەبن بەڵام یەک تاڵە قژی تەڕ نابێت. بۆچی؟",
+                    answers: [
+                        { text: "چونکە کەچەڵە (قژی نییە)", correct: true },
+                        { text: "چونکە قژی کورتە", correct: false },
+                        { text: "چونکە جێڵی لە قژی داوە", correct: false },
+                        { text: "چونکە کڵاوی نایلۆنی پێبووە", correct: false }
+                    ]
+                },
+                {
+                    question: "مەتەڵ: شتێک هەیە بە پێوە دەنیشێت و بە دانیشتنەوە ڕادەوەستێت؟",
+                    answers: [
+                        { text: "ئەساب", correct: true },
+                        { text: "پشیلە", correct: false },
+                        { text: "مرۆڤ", correct: false },
+                        { text: "کۆتر", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: سێ مانگ ٣١ ڕۆژە، چەند مانگ ٢٨ ڕۆژی تێدایە؟",
+                    answers: [
+                        { text: "١٢ مانگ (هەموو مانگەکان لانی کەم ٢٨ ڕۆژیان تێدایە)", correct: true },
+                        { text: "تەنها ١ مانگ (شوبات)", correct: false },
+                        { text: "٤ مانگ", correct: false },
+                        { text: "هیچ مانگێک", correct: false }
+                    ]
+                },
+                {
+                    question: "مەتەڵ: شتێک چییە کە دەگری بێ چاو، دەڕوات بێ پێ؟",
+                    answers: [
+                        { text: "هەور", correct: true },
+                        { text: "ڕووبار", correct: false },
+                        { text: "مۆم", correct: false },
+                        { text: "کاتژمێر", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: شتێک تا زیاتر وشکی بکەیتەوە، خۆی زیاتر تەڕ دەبێت؟",
+                    answers: [
+                        { text: "خاولی", correct: true },
+                        { text: "ئاو", correct: false },
+                        { text: "ئیسفەنج", correct: false },
+                        { text: "جلشۆر", correct: false }
+                    ]
+                },
+                {
+                    question: "مەتەڵ: کێیە ئەو کەسەی کوڕی باوکتە بەڵام برای تۆ نییە؟",
+                    answers: [
+                        { text: "خۆت", correct: true },
+                        { text: "مامت", correct: false },
+                        { text: "خاڵۆت", correct: false },
+                        { text: "هاوڕێت", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: چۆن دەتوانیت بۆ ماوەی ٨ ڕۆژ بێ خەو بیت و هیچ کێشەت بۆ دروست نەبێت؟",
+                    answers: [
+                        { text: "بە شەودا دەخەوم", correct: true },
+                        { text: "قاوە زۆر دەخۆمەوە", correct: false },
+                        { text: "وەرزش دەکەم", correct: false },
+                        { text: "ئەمە مەحاڵە", correct: false }
+                    ]
+                },
+                {
+                    question: "مەتەڵ: شتێک کێشی نییە بەڵام دەتوانیت بە چاو بیبینیت، ئەگەر بیخەیتە ناو بەرمیلێک ئاوەوە کێشی بەرمیلەکە سووکتر دەکات؟",
+                    answers: [
+                        { text: "کون", correct: true },
+                        { text: "سێبەر", correct: false },
+                        { text: "هەوا", correct: false },
+                        { text: "سەھۆڵ", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: کاتێک من تەمەنم ٦ ساڵ بوو، برام نیوەی تەمەنی منی هەبوو. ئێستا من تەمەنم ٧٠ ساڵە، برام تەمەنی چەندە？",
+                    answers: [
+                        { text: "٦٧ ساڵ", correct: true },
+                        { text: "٣٥ ساڵ", correct: false },
+                        { text: "٦٥ ساڵ", correct: false },
+                        { text: "٦٨ ساڵ", correct: false }
+                    ]
+                },
+                {
+                    question: "مەتەڵ: دەتوانیت بیگریت بەڵام ناتوانیت فڕێی بدەیت؟",
+                    answers: [
+                        { text: "هەڵامەت", correct: true },
+                        { text: "تۆپ", correct: false },
+                        { text: "پشیلە", correct: false },
+                        { text: "کلیل", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: ئەگەر گەشتیارێک بگەڕێتەوە بۆ ڕابردوو و ڕێگری بکات لەوەی باپیر و داپیری یەکتر ببینن، چی ڕوودەدات؟",
+                    answers: [
+                        { text: "پارادۆکسی کات دروست دەبێت و خۆی بوونی نامێنێت", correct: true },
+                        { text: "هیچ ڕوونادات", correct: false },
+                        { text: "داپیری دەمرێت", correct: false },
+                        { text: "کات خێراتر دەبێت", correct: false }
+                    ]
+                },
+                {
+                    question: "مەتەڵ: ڕەشە کاتێک دەیکڕیت، سوورە کاتێک بەکاری دەهێنیت، خۆڵەمێشییە کاتێک فڕێی دەدەیت؟",
+                    answers: [
+                        { text: "خەڵوز", correct: true },
+                        { text: "چای وشک", correct: false },
+                        { text: "ئاگر", correct: false },
+                        { text: "ئاسن", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: لە چ شوێنێکدا دوێنێ دەکەوێتە دوای ئەمڕۆ؟",
+                    answers: [
+                        { text: "لە ناو فەرهەنگدا", correct: true },
+                        { text: "لە هەسارەیەکی تردا", correct: false },
+                        { text: "لە ناو خەوندا", correct: false },
+                        { text: "لە مێژوودا", correct: false }
+                    ]
+                },
+                {
+                    question: "مەتەڵ: بینایەکی زۆر گەورەیە، ملیۆنان چیرۆکی تێدایە بەڵام هیچ دەنگێکی لێوە نایەت؟",
+                    answers: [
+                        { text: "کتێبخانە", correct: true },
+                        { text: "نەخۆشخانە", correct: false },
+                        { text: "قوتابخانە", correct: false },
+                        { text: "هووتێل", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: ئەگەر تەنها یەک شیلکت پێبێت و بچیتە ژوورێکی تاریک و سارد کە چرایەکی نەوتی، سۆبەیەکی دار و مۆمێکی تێدایە، کامەیان یەکەم جار دادەگیرسێنیت؟",
+                    answers: [
+                        { text: "شیلکەکە", correct: true },
+                        { text: "مۆمەکە", correct: false },
+                        { text: "چرایەکی نەوتی", correct: false },
+                        { text: "سۆبەکە", correct: false }
+                    ]
+                },
+                {
+                    question: "مەتەڵ: هەمیشە تینووی ئاوە، ئەگەر ئاوی پێ بدەیت دەمرێت؟",
+                    answers: [
+                        { text: "ئاگر", correct: true },
+                        { text: "خاک", correct: false },
+                        { text: "وشکانی", correct: false },
+                        { text: "درەخت", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: ئەگەر فڕۆکەیەک لەسەر سنووری نێوان عێراق و ئێران بکەوێتە خوارەوە، بریندارەکان لە کام وڵات دەنێژرێن؟",
+                    answers: [
+                        { text: "بریندارەکان نانێژرێن", correct: true },
+                        { text: "عێراق", correct: false },
+                        { text: "ئێران", correct: false },
+                        { text: "لەسەر سنوورەکە", correct: false }
+                    ]
+                },
+                {
+                    question: "مەتەڵ: پێستێکی ڕەقی هەیە، دار نییە. هێلکە دەکات، باڵندە نییە. ئاو دەخواتەوە، مرۆڤ نییە. ئەو چییە؟",
+                    answers: [
+                        { text: "کیسەڵ", correct: true },
+                        { text: "مار", correct: false },
+                        { text: "تەساح", correct: false },
+                        { text: "مریشک", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: لە ناو باخچەیەکدا، هەموان مردوون تەنها دوو کەس نەبێت، چۆن دەکرێت؟",
+                    answers: [
+                        { text: "چونکە تەنها دوو کەس زیندوون لەوێ", correct: true },
+                        { text: "باخچەکە هی مردووانە", correct: false },
+                        { text: "هەموان ژەهرخوارد کراون", correct: false },
+                        { text: "مەتەڵەکە ناڕاستە", correct: false }
+                    ]
+                },
+                {
+                    question: "مەتەڵ: ئەو شتە چییە کە قاچی نییە بەڵام بە سەر دیواردا سەردەکەوێت؟",
+                    answers: [
+                        { text: "ڕووەکی لابلاب", correct: true },
+                        { text: "مار", correct: false },
+                        { text: "کرم", correct: false },
+                        { text: "حەلەزۆن", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: ئەگەر شێوەیەکی بازنەیی پاک و تەواوت هەبێت، چەند گۆشەی تێدایە؟",
+                    answers: [
+                        { text: "سفر", correct: true },
+                        { text: "٣٦٠ گۆشە", correct: false },
+                        { text: "٤ گۆشە", correct: false },
+                        { text: "١٨٠ گۆشە", correct: false }
+                    ]
+                },
+                {
+                    question: "مەتەڵ: شتێک چییە کە پێت دەبەخشێت کلیل بۆ دەرگا کاتێک هیچ دەرگایەک نییە؟",
+                    answers: [
+                        { text: "کیبۆردی کۆمپیوتەر", correct: true },
+                        { text: "پاسپۆرت", correct: false },
+                        { text: "کلیل و قوفڵ", correct: false },
+                        { text: "نەخشە", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: ئەگەر دەنکە لمیەک لە گردێکی لم لابدەیت، هێشتا گردە. ئەگەر بەردەوام بیت، لە چ خاڵێکدا چیتر پێی ناوترێت گرد؟",
+                    answers: [
+                        { text: "ئەمە پارادۆکسە و سنوورێکی جێگیری لۆژیکی نییە", correct: true },
+                        { text: "کاتێک دەگاتە ١٠ دەنکە لم", correct: false },
+                        { text: "کاتێک دەگاتە نیوەی کێشەکەی", correct: false },
+                        { text: "کاتێک تەنها یەک دەنک دەمێنێتەوە", correct: false }
+                    ]
+                },
+                {
+                    question: "مەتەڵ: زمانێکی نییە بەڵام بە هەموو زمانەکانی جیهان قسە دەکات کاتێک تۆ قسەی لەگەڵ دەکەیت؟",
+                    answers: [
+                        { text: "دەنگدانەوە", correct: true },
+                        { text: "تۆمارکەری دەنگ", correct: false },
+                        { text: "تەلەفۆن", correct: false },
+                        { text: "ئاوێنە", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: سێ کەس لە ئاودا مەلە دەکەن، بەڵام کاتێک دێنە دەرەوە تەنها قژی دوو کەسیان تەڕ بووە. بۆچی؟",
+                    answers: [
+                        { text: "چونکە یەکێکیان کچەڵ بوو", correct: true },
+                        { text: "چونکە یەکێکیان کڵاوی مەلەی لەسەر بوو", correct: false },
+                        { text: "چونکە یەکێکیان کچ بوو", correct: false },
+                        { text: "چونکە یەکێکیان نەچووە ژێر ئاوەکە", correct: false }
+                    ]
+                },
+                {
+                    question: "مەتەڵ: پارچە بەردێکە لە ئاودا نافەوێت، لە ئاگردا نەسوتێت، لە کوێدایە؟",
+                    answers: [
+                        { text: "سەهۆڵ", correct: true },
+                        { text: "ئەڵماس", correct: false },
+                        { text: "خەڵوز", correct: false },
+                        { text: "ئاسن", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: ئەگەر پیاوێک لە نهۆمی ١٥ی تەلارێکەوە خۆی فڕێ بداتە خوارەوە و بە سەلامەتی ڕزگاری بێت بێ ئەوەی هیچ ئامێرێک بەکاربهێنێت، چۆن ئەمە دەبێت؟",
+                    answers: [
+                        { text: "چونکە لە پەنجەرەی ناوەوەی ژوورەکە خۆی فڕێ داوەتە سەر فەرشەکە", correct: true },
+                        { text: "چونکە بە شانس ڕزگاری بووە", correct: false },
+                        { text: "چونکە جادووگەر بووە", correct: false },
+                        { text: "چونکە کەوتووەتە سەر ئۆتۆمبێلێک", correct: false }
+                    ]
+                },
+                {
+                    question: "مەتەڵ: شتێک لە ئاسماندایە سپییە، لە زەویدا ڕەشە، لە چێشتخانەدا سوورە؟",
+                    answers: [
+                        { text: "خەڵوز", correct: true },
+                        { text: "دووکەڵ", correct: false },
+                        { text: "ئاگر", correct: false },
+                        { text: "پیاز", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: ئەگەر هێمای خاڵی ناوەڕاستی ڕێگایەک بیت، هەمیشە وەک یەک دووری لە سەرەتا و کۆتایی، تۆ چییت؟",
+                    answers: [
+                        { text: "ناوەڕاست", correct: true },
+                        { text: "سەنتەر", correct: false },
+                        { text: "کۆتایی", correct: false },
+                        { text: "سەرەتا", correct: false }
+                    ]
+                },
+                {
+                    question: "مەتەڵ: ئەو چاوەیە کە قەت ناتوانێت هیچ شتێک ببێنێت؟",
+                    answers: [
+                        { text: "چاوی دەرزی", correct: true },
+                        { text: "چاوی کوندەپەپوو", correct: false },
+                        { text: "چاوی تێکچوو", correct: false },
+                        { text: "چاوی تەلەفۆن", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: ئەگەر لە کاتژمێر ١٢ی شەودا بارانێکی بەخوڕ ببارێت، ئایا دەکرێت دوای ٧٢ کاتژمێری تر کەشێکی تەواو هەتاوی ببینی؟",
+                    answers: [
+                        { text: "نەخێر (ڕێک دەبێتەوە بە ١٢ی شەو)", correct: true },
+                        { text: "بەڵێ دەکرێت", correct: false },
+                        { text: "تەنها لە هاویندا دەکرێت", correct: false },
+                        { text: "پەیوەندی بە وەرزەکەوە هەیە", correct: false }
+                    ]
+                },
+                {
+                    question: "مەتەڵ: شتێک هەیە دەچێتە ناو ئاوەوە بەڵام تەڕ نابێت؟",
+                    answers: [
+                        { text: "تیشکی ڕووناکی", correct: true },
+                        { text: "زەیت", correct: false },
+                        { text: "شوشە", correct: false },
+                        { text: "هەوا", correct: false }
+                    ]
+                },
+                {
+                    question: "لۆژیک: ئەگەر سندوقێک پڕ بێت لە سێو، تۆ ٣ سێوی لێ دەبەیت، ئێستا تۆ چەند سێوت پێیە؟",
+                    answers: [
+                        { text: "٣ سێو", correct: true },
+                        { text: "سندوقەکە چۆڵە", correct: false },
+                        { text: "بێ سێو", correct: false },
+                        { text: "تەنها ١ سێو", correct: false }
+                    ]
+                },
+                {
+                    question: "مەتەڵ: دەتوانیت بە ئاسانی بیبیستیت، بەڵام ناتوانیت دەستی لێبدەیت، و کاتێک قسە دەکەیت وەڵامت دەداتەوە؟",
+                    answers: [
+                        { text: "دەنگدانەوە", correct: true },
+                        { text: "با", correct: false },
+                        { text: "مۆبایل", correct: false },
+                        { text: "گیانەوەر", correct: false }
+                    ]
+                }
             ],
             kurdish: [
-                {q: "پایتەختی ئیمپراتۆریەتی میدیا کام شار بوو؟", a: [{t: "ئەحمەدان", c: true}, {t: "نەینەوا", c: false}, {t: "بابل", c: false}]},
-                {q: "یەکەم ڕۆژنامەی کوردی لە چ شارێکدا دەرچوو؟", a: [{t: "قاهیرە", c: true}, {t: "ئەستەمبوڵ", c: false}, {t: "بەغداد", c: false}]},
-                // لێرە ٤٨ پرسیاری تری مێژوو دابنێ...
+                {
+                    question: "کوردستان: ئیمپراتۆریەتی میدیا لە چ سەدەیەکدا دامەزرا؟",
+                    answers: [
+                        { text: "سەدەی حەوتمی پێش زایین", correct: true },
+                        { text: "سەدەی پێنجەمی پێش زایین", correct: false },
+                        { text: "سەدەی یەکەمی زایینی", correct: false },
+                        { text: "سەدەی دەیەمی پێش زایین", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: یەکەم ڕۆژنامەی کوردی (ڕۆژنامەی کوردستان) لە چ شارێکدا دەرچوو؟",
+                    answers: [
+                        { text: "قاهیرە", correct: true },
+                        { text: "ئەستەمبوڵ", correct: false },
+                        { text: "بەغداد", correct: false },
+                        { text: "مەهاباد", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: پایتەختی ئیمپراتۆریەتی میدیا کام شار بوو؟",
+                    answers: [
+                        { text: "ئەحمەدان (ئەگبەتانا)", correct: true },
+                        { text: "نەینەوا", correct: false },
+                        { text: "بابل", correct: false },
+                        { text: "هەولێر", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: یەکەم کۆماری کوردی لە سەدەی بیستەمدا لە کام شار ڕاگەیەندرا؟",
+                    answers: [
+                        { text: "مەهاباد", correct: true },
+                        { text: "سلێمانی", correct: false },
+                        { text: "دیاربەکر", correct: false },
+                        { text: "قامیشلۆ", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: سەرکردەی شۆڕشی ئەیلوولی مەزن کێ بوو؟",
+                    answers: [
+                        { text: "مەلا مستەفا بارزانی", correct: true },
+                        { text: "شێخ مەحمودی حەفید", correct: false },
+                        { text: "قازی محەمەد", correct: false },
+                        { text: "شێخ سەعیدی پیران", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: شێخ مەحمودی حەفید لە چ شارێکدا حکومەتی خوارووی کوردستانی ڕاگەیاند؟",
+                    answers: [
+                        { text: "سلێمانی", correct: true },
+                        { text: "هەولێر", correct: false },
+                        { text: "کەرکوک", correct: false },
+                        { text: "دهۆک", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: شۆڕشی شێخ سەعیدی پیران لە چ ساڵێکدا بەرپا بوو؟",
+                    answers: [
+                        { text: "١٩٢٥", correct: true },
+                        { text: "١٩١٥", correct: false },
+                        { text: "١٩٣٥", correct: false },
+                        { text: "١٩٤٥", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: میرنشینی بابان پایتەختەکەی لە قەڵاچوالانەوە گوازرایەوە بۆ کام شار؟",
+                    answers: [
+                        { text: "سلێمانی", correct: true },
+                        { text: "کەرکوک", correct: false },
+                        { text: "کۆیە", correct: false },
+                        { text: "ڕانیە", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: کام شاعیری گەورەی کورد هۆنراوەی سروودی نەتەوەیی (ئەی ڕەقیب)ی نووسیوە؟",
+                    answers: [
+                        { text: "دڵدار", correct: true },
+                        { text: "بێکەس", correct: false },
+                        { text: "قانع", correct: false },
+                        { text: "هێمن", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: ئەشکەوتی شانەدەر کە شوێنەوارێکی گرنگی مرۆڤی نیاندەرتاڵە، لە کام پارێزگایە؟",
+                    answers: [
+                        { text: "هەولێر", correct: true },
+                        { text: "سلێمانی", correct: false },
+                        { text: "دهۆک", correct: false },
+                        { text: "کەرکوک", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: دامەزرێنەری میرنشینی سۆران کێ بوو؟",
+                    answers: [
+                        { text: "کەڵۆس", correct: true },
+                        { text: "میر مستەفا", correct: false },
+                        { text: "میر محەمەد (پاشای کۆر)", correct: false },
+                        { text: "شێخ عوبەیدوڵڵا", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: میرنشینی بەھدینان پایتەختەکەی کام شار بوو؟",
+                    answers: [
+                        { text: "ئامێدی", correct: true },
+                        { text: "زۆزان", correct: false },
+                        { text: "عەقڕە", correct: false },
+                        { text: "زاخۆ", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: کام سەرکردەی کورد لە مێژوودا قودسی ڕزگار کرد؟",
+                    answers: [
+                        { text: "سەڵاحەدینی ئەیووبی", correct: true },
+                        { text: "میدیا کاردۆخی", correct: false },
+                        { text: "کەریمخانی زەند", correct: false },
+                        { text: "شەرەفخانی بەدلیسی", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: پەیماننامەی سایکس-پیکۆ کە تێیدا کوردستان دابەش کرا، لە چ ساڵێکدا بوو؟",
+                    answers: [
+                        { text: "١٩١٦", correct: true },
+                        { text: "١٩٢٠", correct: false },
+                        { text: "١٩٢٣", correct: false },
+                        { text: "١٩١٤", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: لە کام پەیماننامەدا بۆ یەکەم جار ماف و حوکمی زاتی بۆ کورد داندرا بەڵام جێبەجێ نەکرا؟",
+                    answers: [
+                        { text: "پەیماننامەی سیڤەر", correct: true },
+                        { text: "پەیماننامەی لۆزان", correct: false },
+                        { text: "پەیماننامەی جەزائیر", correct: false },
+                        { text: "پەیماننامەی ئەماسیا", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: پەیماننامەی لۆزان کە مافەکانی کوردی تێدا پشتگوێ خرا، لە چ ساڵێکدا واژۆ کرا؟",
+                    answers: [
+                        { text: "١٩٢٣", correct: true },
+                        { text: "١٩٢٠", correct: false },
+                        { text: "١٩١٨", correct: false },
+                        { text: "١٩٣٠", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: شاعیری گەورە (نالی) سەر بە کام میرنشینی کوردی بوو؟",
+                    answers: [
+                        { text: "میرنشینی بابان", correct: true },
+                        { text: "میرنشینی سۆران", correct: false },
+                        { text: "میرنشینی بۆتان", correct: false },
+                        { text: "میرنشینی بادینان", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: گەورەترین و کۆنترین قەڵای نیشتەجێبوون لە جیهاندا کە دەکەوێتە پایتەختی هەرێم ناوی چییە؟",
+                    answers: [
+                        { text: "قەڵای هەولێر", correct: true },
+                        { text: "قەڵای کەرکوک", correct: false },
+                        { text: "قەڵای ئامێدی", correct: false },
+                        { text: "قەڵای شێروانە", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: شۆڕشی ئەیلوول لە چ ساڵێکدا دەستی پێکرد؟",
+                    answers: [
+                        { text: "١٩٦١", correct: true },
+                        { text: "١٩٥٨", correct: false },
+                        { text: "١٩٧٠", correct: false },
+                        { text: "١٩٧٥", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: یەکەم گۆڤاری ئەدەبی و فەرمی کوردی بە ناوی (ڕۆژی کورد) لە چ ساڵێکدا دەرچوو؟",
+                    answers: [
+                        { text: "١٩١٣", correct: true },
+                        { text: "١٩٠٨", correct: false },
+                        { text: "١٩٢٠", correct: false },
+                        { text: "١٨٩٨", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: یەکەم زانکۆ لە باشووری کوردستان لە کام شار دامەزرا؟",
+                    answers: [
+                        { text: "سلێمانی", correct: true },
+                        { text: "هەولێر", correct: false },
+                        { text: "کەرکوک", correct: false },
+                        { text: "دهۆک", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: کتێبی مێژوویی (شەرەفنامە) کە مێژووی میرنشینە کوردییەکانە لەلایەن کێوە نووسرا؟",
+                    answers: [
+                        { text: "شەرەفخانی بەدلیسی", correct: true },
+                        { text: "ئەحمەدی خانی", correct: false },
+                        { text: "مستەفا پاشای یامولکی", correct: false },
+                        { text: "کۆچەری", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: داستانە ناودارەکەی (مەم و زین) لەلایەن کام شاعیری گەورەوە نووسراوە؟",
+                    answers: [
+                        { text: "ئەحمەدی خانی", correct: true },
+                        { text: "مەلای جزیری", correct: false },
+                        { text: "فەقێی تەیران", correct: false },
+                        { text: "حاجی قادری کۆیی", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: شاڵاوی بەدناوی ئەنفال لەلایەن ڕژێمی بەعسەوە لە چەند قۆناغدا ئەنجامدرا؟",
+                    answers: [
+                        { text: "٨ قۆناغ", correct: true },
+                        { text: "٦ قۆناغ", correct: false },
+                        { text: "٤ قۆناغ", correct: false },
+                        { text: "١٠ قۆناغ", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: کارەساتی کیمیابارانی هەڵەبجە لە چ ڕێکەوت و ساڵێکدا بوو؟",
+                    answers: [
+                        { text: "١٦-٣-١٩٨٨", correct: true },
+                        { text: "١٤-٤-١٩٨٨", correct: false },
+                        { text: "١٦-٣-١٩٨٧", correct: false },
+                        { text: "١١-٣-١٩٩١", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: ڕاپەڕینە مەزنەکەی گەلی کوردستان لە چ ساڵێکدا ڕوویدا؟",
+                    answers: [
+                        { text: "١٩٩١", correct: true },
+                        { text: "١٩٩٢", correct: false },
+                        { text: "١٩٨٨", correct: false },
+                        { text: "٢٠٠٣", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: یەکەم چەخماخە و دەستپێکی ڕاپەڕینی ساڵی ١٩٩١ لە کام شارۆچکەوە دەستی پێکرد؟",
+                    answers: [
+                        { text: "ڕانیە", correct: true },
+                        { text: "کۆیە", correct: false },
+                        { text: "کفری", correct: false },
+                        { text: "حاجی ئۆمەران", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: یەکەم هەڵبژاردنی پەرلەمانی کوردستان لە چ ساڵێکدا ئەنجامدرا؟",
+                    answers: [
+                        { text: "١٩٩٢", correct: true },
+                        { text: "١٩٩١", correct: false },
+                        { text: "١٩٩٥", correct: false },
+                        { text: "٢٠٠٠", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: ڕێککەوتنامەی مێژوویی ١١ی ئازار لە نێوان شۆڕشی کورد و حکومەتی بەغدا لە چ ساڵێکدا واژۆ کرا؟",
+                    answers: [
+                        { text: "١٩٧٠", correct: true },
+                        { text: "١٩٧٤", correct: false },
+                        { text: "١٩٦٨", correct: false },
+                        { text: "١٩٧٥", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: یەکەم سەرۆکی کۆماری عێراق لە دوای ساڵی ٢٠٠٣ کە سەرکردەیەکی ناوداری کورد بوو کێ بوو؟",
+                    answers: [
+                        { text: "مام جەلال تاڵەبانی", correct: true },
+                        { text: "مەسعود بارزانی", correct: false },
+                        { text: "د. بەرهەم ساڵح", correct: false },
+                        { text: "فؤاد معصوم", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: میرنشینی ئەیووبی لەلایەن سەڵاحەدینی ئەیووبییەوە لە کام وڵات دامەزرا؟",
+                    answers: [
+                        { text: "میسر", correct: true },
+                        { text: "عێراق", correct: false },
+                        { text: "شام", correct: false },
+                        { text: "تورکیا", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: دەوڵەتی مەروانی لە کام پارچەی کوردستان فەرمانڕەوایی دەکرد؟",
+                    answers: [
+                        { text: "باکووری کوردستان (ئامەد)", correct: true },
+                        { text: "باشووری کوردستان", correct: false },
+                        { text: "ڕۆژهەڵاتی کوردستان", correct: false },
+                        { text: "ڕۆژئاوای کوردستان", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: میرنشینی ئەردەڵان پایتەختەکەی کام شار بوو؟",
+                    answers: [
+                        { text: "سنە", correct: true },
+                        { text: "کرماشان", correct: false },
+                        { text: "مەهاباد", correct: false },
+                        { text: "سەقز", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: کام پادشای عێراق لە ساڵی ١٩٢١دا سەردانی شێخ مەحمودی حەفیدی کرد؟",
+                    answers: [
+                        { text: "مەلیک فەیسەڵی یەکەم", correct: true },
+                        { text: "مەلیک غازی", correct: false },
+                        { text: "مەلیک فەیسەڵی دووەم", correct: false },
+                        { text: "عەبدوڵڵای یەکەم", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: کام مێژوونووسی کورد کتێبی (مێژووی ناودارانی کورد)ی نووسیوە؟",
+                    answers: [
+                        { text: "بابا مەردۆخی ڕۆحانی", correct: true },
+                        { text: "محەمەد ئەمین زەکی بەگ", correct: false },
+                        { text: "مەلا جەمیل ڕۆژبەیانی", correct: false },
+                        { text: "عەلائەدین سەجادی", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: مێژوونووسی گەورە (محەمەد ئەمین زەکی بەگ) لە چ شارێکدا لەدایکبووە؟",
+                    answers: [
+                        { text: "سلێمانی", correct: true },
+                        { text: "هەولێر", correct: false },
+                        { text: "کەرکوک", correct: false },
+                        { text: "خانەقین", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: ڕێککەوتنامەی جەزائیر کە بووە هۆی نسکۆی شۆڕشی ئەیلوول لە چ ساڵێکدا بوو؟",
+                    answers: [
+                        { text: "١٩٧٥", correct: true },
+                        { text: "١٩٧٤", correct: false },
+                        { text: "١٩٧٦", correct: false },
+                        { text: "١٩٧٠", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: گۆڕستانی مێژوویی (گردی سەیوان) دەکەوێتە کام شاری کوردستان？",
+                    answers: [
+                        { text: "سلێمانی", correct: true },
+                        { text: "هەولێر", correct: false },
+                        { text: "کەرکوک", correct: false },
+                        { text: "دهۆک", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: پردی مێژوویی (دەلال) لە کام شارە؟",
+                    answers: [
+                        { text: "زاخۆ", correct: true },
+                        { text: "ئامێدی", correct: false },
+                        { text: "عەقڕە", correct: false },
+                        { text: "ڕواندز", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: شۆڕشی گوڵانی پێشکەوتنخواز لە چ ساڵێکدا دەستی پێکرد؟",
+                    answers: [
+                        { text: "١٩٧٦", correct: true },
+                        { text: "١٩٧٥", correct: false },
+                        { text: "١٩٧٨", correct: false },
+                        { text: "١٩٨٠", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: ناوی لۆژیکی و مێژوویی ئەو ناوچەیەی کە لە دەقە کۆنەکانی سۆمەریدا باس کراوە چییە؟",
+                    answers: [
+                        { text: "کوردۆخیا یان کارتۆخا", correct: true },
+                        { text: "ئاشوور", correct: false },
+                        { text: "ئەکەد", correct: false },
+                        { text: "فینیکیا", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: میرنشینی حەسەنوەیهی کوردی لە چ سەدەیەکدا دامەزرا؟",
+                    answers: [
+                        { text: "سەدەی دەیەمی زایینی", correct: true },
+                        { text: "سەدەی دوازدەیەمی زایینی", correct: false },
+                        { text: "سەدەی هەشتەمی زایینی", correct: false },
+                        { text: "سەدەی شەشەمی زایینی", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: سەرکردەی لێهاتوو میر محەمەد ناسراو بە پاشای کۆر سەر بە کام میرنشین بوو؟",
+                    answers: [
+                        { text: "میرنشینی سۆران", correct: true },
+                        { text: "میرنشینی بابان", correct: false },
+                        { text: "میرنشینی بۆتان", correct: false },
+                        { text: "میرنشینی بەھدینان", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: لە چ ساڵێکدا شاری کەرکوک خرایە سەر دەوڵەتی نوێی عێراق؟",
+                    answers: [
+                        { text: "١٩ ٢٥", correct: true },
+                        { text: "١٩٢١", correct: false },
+                        { text: "١٩٣٢", correct: false },
+                        { text: "١٩١٨", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: ناوی پاشای بەناوبانگی گۆتییەکان چی بوو؟",
+                    answers: [
+                        { text: "ئەنریدا پازیر", correct: true },
+                        { text: "حاموڕابی", correct: false },
+                        { text: "سەرجۆنی ئەکەدی", correct: false },
+                        { text: "نەبووخەد نەسەر", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: قەڵای مێژوویی (خۆشەو) دەکەوێتە کام ناوچە؟",
+                    answers: [
+                        { text: "هەولێر (شقڵاوە)", correct: true },
+                        { text: "سلێمانی", correct: false },
+                        { text: "دهۆک", correct: false },
+                        { text: "هەڵەبجە", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: گۆڤاری (هاوار) لەلایەن کێوە دەرچوو؟",
+                    answers: [
+                        { text: "جەلادەت عالی بەدرخان", correct: true },
+                        { text: "پیرەمێرد", correct: false },
+                        { text: "فایق بێکەس", correct: false },
+                        { text: "عەبدوڵڵا جەوهەر", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: کام میرنشینی کوردی لە مێژوودا سکەی پارەی تایبەت بە خۆی لێدا؟",
+                    answers: [
+                        { text: "میرنشینی سۆران", correct: true },
+                        { text: "میرنشینی ئەردەڵان", correct: false },
+                        { text: "میرنشینی بادینان", correct: false },
+                        { text: "میرنشینی حەکاری", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: پیرەمێرد خاوەنی کام ڕۆژنامەی مێژوویی بوو لە سلێمانی؟",
+                    answers: [
+                        { text: "ڕۆژنامەی ژین", correct: true },
+                        { text: "ڕۆژنامەی کوردستان", correct: false },
+                        { text: "ڕۆژنامەی گەل", correct: false },
+                        { text: "ڕۆژنامەی ئومێد", correct: false }
+                    ]
+                },
+                {
+                    question: "کوردستان: کۆنترین پاشماوەی کشتوکاڵی لە جیهاندا لە کام گوندی کوردستان دۆزرایەوە؟",
+                    answers: [
+                        { text: "چەرمۆ", correct: true },
+                        { text: "شانەدەر", correct: false },
+                        { text: "بێستان سوور", correct: false },
+                        { text: "مەلەفاو", correct: false }
+                    ]
+                }
+            ],
+            world: [
+                {
+                    question: "مێژووی جیهان: شۆڕشی فەڕەنسا لە چ ساڵێکدا بەرپا بوو؟",
+                    answers: [
+                        { text: "١٧٨٩", correct: true },
+                        { text: "١٦٨٩", correct: false },
+                        { text: "١٨٨٩", correct: false },
+                        { text: "١٩٠٢", correct: false }
+                    ]
+                },
+                {
+                    question: "مێژووی جیهان: کام شارستانییەت یەکەم پیت و نووسینی (بزماری) داهێنا؟",
+                    answers: [
+                        { text: "سۆمەرییەکان", correct: true },
+                        { text: "فیرعەونەکان", correct: false },
+                        { text: "ڕۆمانییەکان", correct: false },
+                        { text: "گریکییەکان", correct: false }
+                    ]
+                }
             ]
         };
-        let cat = '', idx = 0, score = 0;
-        function start(c) { cat = c; idx = 0; document.getElementById('menu').classList.add('hide'); document.getElementById('quiz').classList.remove('hide'); show(); }
-        function show() {
-            let q = data[cat][idx];
-            document.getElementById('q-text').innerText = q.q;
-            let div = document.getElementById('a-btns'); div.innerHTML = '';
-            [...q.a].sort(() => Math.random() - 0.5).forEach(ans => {
-                let b = document.createElement('button'); b.className = 'btn'; b.innerText = ans.t;
-                b.onclick = () => {
-                    Array.from(div.children).forEach(btn => btn.disabled = true);
-                    ans.c ? b.classList.add('correct') : b.classList.add('incorrect');
-                    if(ans.c) score++;
-                };
-                div.appendChild(b);
+
+        let currentCategory = '';
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        function startQuiz(category) {
+            if (category === 'world') {
+                alert('ئەم بەشە بەم زووانە پڕ دەکرێتەوە!');
+                return;
+            }
+            currentCategory = category;
+            currentQuestionIndex = 0;
+            score = 0;
+            document.getElementById('menu-screen').classList.add('hide');
+            document.getElementById('quiz-screen').classList.remove('hide');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            resetState();
+            const currentQuestion = quizData[currentCategory][currentQuestionIndex];
+            document.getElementById('question-counter').innerText = `پرسیاری ${currentQuestionIndex + 1} لە ${quizData[currentCategory].length}`;
+            document.getElementById('question-text').innerText = currentQuestion.question;
+
+            currentQuestion.answers.forEach(answer => {
+                const button = document.createElement('button');
+                button.innerText = answer.text;
+                button.classList.add('answer-btn');
+                if (answer.correct) {
+                    button.dataset.correct = answer.correct;
+                }
+                button.addEventListener('click', selectAnswer);
+                document.getElementById('answer-buttons').appendChild(button);
             });
         }
-        function next() { idx++; idx < data[cat].length ? show() : alert('ئەنجام: ' + score); }
+
+        function resetState() {
+            document.getElementById('next-btn').classList.add('hide');
+            const answerButtons = document.getElementById('answer-buttons');
+            while (answerButtons.firstChild) {
+                answerButtons.removeChild(answerButtons.firstChild);
+            }
+        }
+
+        function selectAnswer(e) {
+            const selectedButton = e.target;
+            const isCorrect = selectedButton.dataset.correct === "true";
+            if (isCorrect) {
+                selectedButton.classList.add('correct');
+                score++;
+            } else {
+                selectedButton.classList.add('incorrect');
+                // ڕەنگکردنی وەڵامە ڕاستەکە بە سەوز
+                Array.from(document.getElementById('answer-buttons').children).forEach(button => {
+                    if (button.dataset.correct === "true") {
+                        button.classList.add('correct');
+                    }
+                });
+            }
+
+            Array.from(document.getElementById('answer-buttons').children).forEach(button => {
+                button.disabled = true;
+            });
+
+            document.getElementById('next-btn').classList.remove('hide');
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData[currentCategory].length) {
+                showQuestion();
+            } else {
+                showQuizResult();
+            }
+        }
+
+        function showQuizResult() {
+            document.getElementById('quiz-screen').classList.add('hide');
+            document.getElementById('result-screen').classList.remove('hide');
+            const totalQuestions = quizData[currentCategory].length;
+            document.getElementById('score-display').innerText = `تۆ توانیت ${score} لە ${totalQuestions} وەڵام بە ڕاستی بدەیتەوە!`;
+        }
+
+        function showMenu() {
+            document.getElementById('result-screen').classList.add('hide');
+            document.getElementById('menu-screen').classList.remove('hide');
+        }
     </script>
 </body>
 </html>

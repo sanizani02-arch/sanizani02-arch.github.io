@@ -1,35 +1,14 @@
-<div class="container">
-    <div id="menu-screen">
-        <!-- سەردێڕ زیادکرا -->
-        <h1 style="color: #3b82f6;">جەنگی مێشک</h1>
-        <p style="margin-bottom: 25px; color: #94a3b8;">گرێکوێرەکانی لۆژیک و مێژوو</p>
-        
-        <button class="menu-btn" onclick="startQuiz('logic')">لۆژیک و مەتەڵ</button>
-        <button class="menu-btn" onclick="startQuiz('kurdish')">مێژووی کوردستان</button>
+<div id="menu-screen" class="container">
+    <!-- سەردێڕەکە -->
+    <h1 style="color: #3b82f6; margin-bottom: 10px;">جەنگی مێشک</h1>
+    
+    <!-- بەشەکان -->
+    <div style="margin-bottom: 25px; color: #94a3b8; font-size: 1.1rem;">
+        <p>گرێکوێرەکانی لۆژیک</p>
+        <p>مێژوو</p>
     </div>
-    <!-- باقی بەشەکانی تر وەک خۆی بمێنێتەوە -->
+
+    <!-- دوگمەکانی دەستپێکردن -->
+    <button class="menu-btn" onclick="startQuiz('logic')">دەستپێکردن: لۆژیک و مەتەڵ</button>
+    <button class="menu-btn" onclick="startQuiz('kurdish')">دەستپێکردن: مێژووی کوردستان</button>
 </div>
-
-<script>
-    // ... لە ناو بەشی startQuiz یان showQuestion ئەم بەشە زیاد بکە بۆ تێکەڵکردنی وەڵامەکان:
-    function showQuestion() {
-        resetState();
-        const currentQuestion = quizData[currentCategory][currentQuestionIndex];
-        document.getElementById('question-text').innerText = currentQuestion.question;
-
-        // تێکەڵکردنی وەڵامەکان بە شێوەی هەڕەمەکی
-        const shuffledAnswers = currentQuestion.answers.sort(() => Math.random() - 0.5);
-
-        shuffledAnswers.forEach(answer => {
-            const button = document.createElement('button');
-            button.innerText = answer.text;
-            button.classList.add('answer-btn');
-            if (answer.correct) {
-                button.dataset.correct = answer.correct;
-            }
-            button.addEventListener('click', selectAnswer);
-            document.getElementById('answer-buttons').appendChild(button);
-        });
-    }
-    // ...
-</script>

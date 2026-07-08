@@ -102,29 +102,29 @@
 
     <div class="container">
         <!-- دەستپێک / مینیو -->
-        <div id="menu-screen">
-            <h1>جەنگی مێشک</h1>
-            <p style="margin-bottom: 25px; color: #94a3b8;">بەشێک هەڵبژێره بۆ دەستپێکردنی تاقیکردنەوەکە:</p>
-            <button class="menu-btn" onclick="startQuiz('logic')">لۆژیک و مەتەڵ (۱٠٠ پرسیار)</button>
-            <button class="menu-btn" onclick="startQuiz('kurdish')">مێژووی کوردستان (٥٠ پرسیار)</button>
-            <button class="menu-btn" onclick="startQuiz('world')">مێژووی جیهان (بەم زووانە)</button>
-        </div>
-
-        <!-- شاشەی پرسیارەکان -->
-        <div id="quiz-screen" class="hide">
-            <div id="question-counter">پرسیار</div>
-            <div id="question-text">لێرە پرسیارەکە پیشان دەدرێت</div>
-            <div id="answer-buttons"></div>
-            <button id="next-btn" class="next-btn hide" onclick="nextQuestion()">پرسیاری داهاتوو</button>
-        </div>
-
-        <!-- شاشەی کۆتایی و ئەنجام -->
-        <div id="result-screen" class="hide">
-            <h1>کۆتایی تاقیکردنەوەکە</h1>
-            <div class="score-text" id="score-display"></div>
-            <button class="menu-btn" onclick="showMenu()">گەڕانەوە بۆ سەرەتا</button>
-        </div>
+        <!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>جه‌نگی مێشک</title>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .container { background-color: #1e293b; padding: 30px; border-radius: 16px; width: 90%; max-width: 500px; text-align: center; }
+        .btn { background-color: #3b82f6; color: white; border: none; padding: 15px; margin: 10px 0; width: 100%; border-radius: 8px; cursor: pointer; font-size: 1.1rem; }
+        .hide { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container" id="menu">
+        <h1>جه‌نگی مێشک</h1>
+        <p>به‌شێک هه‌ڵبژێره‌ بۆ ده‌ستپێکردنی تاقیکردنه‌وه‌که‌:</p>
+        <button class="btn" onclick="alert('تۆ لۆژیکت هەڵبژارد!')">لۆژیک و مەتەڵ (١٠٠ پرسیار)</button>
+        <button class="btn" onclick="alert('تۆ مێژووی کوردستانی هەڵبژارد!')">مێژووی کوردستان (٥٠ پرسیار)</button>
+        <button class="btn" style="background:#64748b">مێژووی جیهان (به‌م زووانه‌)</button>
     </div>
+</body>
+</html>
+
 
     <script>
         const quizData = {

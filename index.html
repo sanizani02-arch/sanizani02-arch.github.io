@@ -5,24 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>جەنگی مێشک</title>
     <style>
-        :root { --bg-color: #0f172a; --card-bg: #1e293b; --text-color: #f8fafc; --accent-color: #3b82f6; }
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { background-color: var(--card-bg); border-radius: 16px; padding: 30px; width: 90%; max-width: 500px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        :root { --bg-color: #0f172a; --card-bg: #1e293b; --text-color: #f8fafc; --accent-color: #3b82f6; --correct-color: #10b981; --incorrect-color: #ef4444; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { background-color: var(--card-bg); border-radius: 16px; padding: 30px; width: 100%; max-width: 650px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
         h1 { color: var(--accent-color); margin-bottom: 10px; }
-        .menu-btn { width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1rem; font-weight: bold; background-color: var(--accent-color); color: white; transition: 0.3s; }
-        .menu-btn:hover { background-color: #2563eb; }
-        .info-text { margin-bottom: 20px; color: #94a3b8; }
+        .menu-btn, .answer-btn, .next-btn { width: 100%; padding: 14px; margin: 10px 0; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1rem; font-weight: bold; background-color: var(--accent-color); color: white; transition: 0.2s; }
+        .answer-btn { background-color: #334155; text-align: right; }
+        .correct { background-color: var(--correct-color) !important; }
+        .incorrect { background-color: var(--incorrect-color) !important; }
+        .hide { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>جەنگی مێشک</h1>
-        <p class="info-text">گرێکوێرەکانی لۆژیک و مێژوو</p>
-        
-        <button class="menu-btn" onclick="alert('دەستپێکردن')">دەستپێکردن: لۆژیک و مەتەڵ</button>
-        <button class="menu-btn" onclick="alert('دەستپێکردن')">دەستپێکردن: مێژووی کوردستان</button>
+    <div class="container" id="main-container">
+        <div id="menu-screen">
+            <h1>جەنگی مێشک</h1>
+            <p style="margin-bottom: 20px; color: #94a3b8;">گرێکوێرەکانی لۆژیک و مێژوو</p>
+            <button class="menu-btn" onclick="startQuiz('logic')">دەستپێکردن: لۆژیک و مەتەڵ</button>
+            <button class="menu-btn" onclick="startQuiz('kurdish')">دەستپێکردن: مێژووی کوردستان</button>
+        </div>
+
+        <div id="quiz-screen" class="hide">
+            <div id="question-text" style="font-size: 1.3rem; margin-bottom: 20px; line-height: 1.6;"></div>
+            <div id="answer-buttons"></div>
+            <button id="next-btn" class="next-btn hide" onclick="nextQuestion()">پرسیاری داهاتوو</button>
+        </div>
+
+        <div id="result-screen" class="hide">
+            <h1>کۆتایی تاقیکردنەوەکە</h1>
+            <div id="score-display" style="margin: 20px 0; font-size: 1.5rem;"></div>
+            <button class="menu-btn" onclick="location.reload()">گەڕانەوە بۆ سەرەتا</button>
+        </div>
     </div>
 
+    <script>
+        const quizData = {
+            logic: [
+                { question: "شتێک هەیە هەمیشە دێت بەڵام قەت ناگات، ئەو شتە چییە؟", answers: [{text: "بەیانی", correct: true}, {text: "دوێنێ", correct: false}, {text: "تەمەن", correct: false}, {text: "سێبەر", correct: false}] },
+                { question: "ئەگەر هێلکەیەک لە ٣ خولەکدا بکوڵێت، چەند خولەک پێویستە بۆ ٥ هێلکە پێکەوە؟", answers: [{text: "٣ خولەک", correct: true}, {text: "١٥ خولەک", correct: false}, {text: "٥ خولەک", correct: false}, {text: "١٠ خولەک", correct: false}] }
+            ],
+            kurdish: [
+                { question: "پایتەختی ئیمپراتۆریەتی میدیا کام شار بوو؟", answers: [{text: "ئەحمەدان", correct: true}, {text: "نەینەوا", correct: false}, {text: "بابل", correct: false}, {text: "هەولێر", correct: false}] },
+                { question: "یەکەم ڕۆژنامەی کوردی لە چ شارێکدا دەرچوو؟", answers: [{text: "قاهیرە", correct: true}, {text: "ئەستەمبوڵ", correct: false}, {text: "بەغداد", correct: false}, {text: "مەهاباد", correct: false}] }
+            ]
+        };
+
+        let currentCategory = '', currentQuestionIndex = 0, score = 0;
+
+        function startQuiz(cat) {
+            currentCategory = cat;
+            document.getElementById('menu-screen').classList.add('hide');
+            document.getElementById('quiz-screen').classList.remove('hide');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = quizData[currentCategory][currentQuestionIndex];
+            document.getElementById('question-text').innerText = q.question;
+            const buttons = document.getElementById('answer-buttons');
+            buttons.innerHTML = '';
+            q.answers.sort(() => Math.random() - 0.5).forEach(a => {
+                const b = document.createElement('button');
+                b.innerText = a.text;
+                b.className = 'answer-btn';
+                b.onclick = () => {
+                    b.classList.add(a.correct ? 'correct' : 'incorrect');
+                    if(a.correct) score++;
+                    Array.from(buttons.children).forEach(btn => btn.disabled = true);
+                    document.getElementById('next-btn').classList.remove('hide');
+                };
+                buttons.appendChild(b);
+            });
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if(currentQuestionIndex < quizData[currentCategory].length) showQuestion();
+            else {
+                document.getElementById('quiz-screen').classList.add('hide');
+                document.getElementById('result-screen').classList.remove('hide');
+                document.getElementById('score-display').innerText = `ئەنجام: ${score} لە ${quizData[currentCategory].length}`;
+            }
+        }
+    </script>
 </body>
 </html>

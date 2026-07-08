@@ -1077,7 +1077,8 @@
             document.getElementById('question-counter').innerText = `پرسیاری ${currentQuestionIndex + 1} لە ${quizData[currentCategory].length}`;
             document.getElementById('question-text').innerText = currentQuestion.question;
 
-            currentQuestion.answers.forEach(answer => {
+            [...currentQuestion.answers].sort(() => Math.random() - 0.5).forEach(answer => {
+
                 const button = document.createElement('button');
                 button.innerText = answer.text;
                 button.classList.add('answer-btn');

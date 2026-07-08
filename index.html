@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>کویزی لۆژیک و مێژوو</title>
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --accent: #ffcc00;
+            --text: #ffffff;
+            --bg: #121212;
+            --card-bg: #222222;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            border-top: 5px solid var(--accent);
+            text-align: center;
+        }
+        h1 { color: var(--accent); }
+        .btn {
+            background-color: var(--accent);
+            color: var(--primary);
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            transition: 0.3s;
+        }
+        .btn:hover { opacity: 0.9; }
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .option-btn {
+            background-color: #333;
+            color: white;
+            border: 1px solid #444;
+            padding: 15px;
+            text-align: right;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .option-btn:hover { background-color: #444; }
+        .hidden { display: none; }
+        .score { font-size: 18px; margin-bottom: 10px; color: var(--accent); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>یاخیبوون بە لۆژیک و مێژوو</h1>
+    <div id="start-screen">
+        <p>بەخێرهاتی بۆ کویزە گەورەکەت! ئامادەیت بۆ تاقیکردنەوەی مێشک؟</p>
+        <button class="btn" onclick="startQuiz()">دەستپێکردن</button>
+    </div>
+
+    <div id="quiz-screen" class="hidden">
+        <div class="score">پرسیار: <span id="q-num">1</span>/100 | خاڵەکانت: <span id="score">0</span></div>
+        <h3 id="question-text">لێرەدا پرسیارەکە پیشان دەدرێت</h3>
+        <div class="options-container" id="options"></div>
+    </div>
+
+    <div id="end-screen" class="hidden">
+        <h2>کۆتایی یارییەکە!</h2>
+        <p>کۆی خاڵەکانت: <span id="final-score">0</span> لە ١٠٠</p>
+        <button class="btn" onclick="location.reload()">دووبارە دەستپێکردنەوە</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "یەکەم پاشای دەوڵەتی ماد کێ بوو؟", os: ["دیاکۆ", "کەیخەسرهو", "ئەستیاگ", "حەمورابی"], a: 0 },
+        { q: "ئەگەر درۆزنێک بڵێت 'من ئێستا درۆ دەکەم'، ئایا ڕاست دەکات یان درۆ؟", os: ["ڕاست دەکات", "درۆ دەکات", "پارادۆکسە (هەردوولا و هیچ کام نییە)", "مەحاڵە"], a: 2 },
+        { q: "جەنگی جیهانی دووەم لە چ ساڵێکدا کۆتایی هات؟", os: ["1918", "1939", "1945", "1950"], a: 2 }
+    ];
+
+    let currentQ = 0;
+    let score = 0;
+
+    function startQuiz() {
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.remove('hidden');
+        showQuestion();
+    }
+
+    function showQuestion() {
+        if(currentQ >= questions.length) {
+            return showEnd();
+        }
+        document.getElementById('q-num').innerText = currentQ + 1;
+        document.getElementById('question-text').innerText = questions[currentQ].q;
+        const optionsDiv = document.getElementById('options');
+        optionsDiv.innerHTML = '';
+        
+        questions[currentQ].os.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(idx);
+            optionsDiv.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selected) {
+        if(selected === questions[currentQ].a) {
+            score++;
+            document.getElementById('score').innerText = score;
+        }
+        currentQ++;
+        showQuestion();
+    }
+
+    function showEnd() {
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('end-screen').classList.remove('hidden');
+        document.getElementById('final-score').innerText = score;
+    }
+</script>
+
+</body>
+</html>

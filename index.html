@@ -1072,7 +1072,7 @@ function selectAnswer(e) {
 
     function startQuiz(category) {
         if (category === 'world') {
-            alert('ئەم بەشە بەم زووانە پڕ دەکرێتەوە!');
+            alert(`ئەم بەشە بەم زووانە بەردەست دەبێت !');
             return;
         }
         currentCategory = category;
@@ -1134,21 +1134,6 @@ function selectAnswer(e) {
         if (currentQuestionIndex < quizData[currentCategory].length) {
             showQuestion();
         } else {
-            showQuizResult();
-        }
-    }
 
-    function showQuizResult() {
-        document.getElementById('quiz-screen').classList.add('hide');
-        document.getElementById('result-screen').classList.remove('hide');
-        const totalQuestions = quizData[currentCategory].length;
-        document.getElementById('score-display').innerText = `تۆ توانیت ${score} لە ${totalQuestions} وەڵام بە ڕاستی بدەیتەوە!`;
-    }
-
-    function showMenu() {
-        document.getElementById('result-screen').classList.add('hide');
-        document.getElementById('menu-screen').classList.remove('hide');
-    }
-</script>
 </body>
 </html>

@@ -1035,22 +1035,31 @@
                 answerButtons.removeChild(answerButtons.firstChild);
             }
         }
-
-        function selectAnswer(e) {
-            const selectedButton = e.target;
-            const isCorrect = selectedButton.dataset.correct === "true";
-            if (isCorrect) {
-                selectedButton.classList.add('correct');
-                score++;
-            } else {
-                selectedButton.classList.add('incorrect');
-                // ڕەنگکردنی وەڵامە ڕاستەکە بە سەوز
-                Array.from(document.getElementById('answer-buttons').children).forEach(button => {
-                    if (button.dataset.correct === "true") {
-                        button.classList.add('correct');
-                    }
-                });
+function selectAnswer(e) {
+    const selectedButton = e.target;
+    const isCorrect = selectedButton.dataset.correct === "true";
+    
+    if (isCorrect) {
+        selectedButton.classList.add('correct');
+        document.getElementById('correct-sound').play(); 
+        score++;
+    } else {
+        selectedButton.classList.add('incorrect');
+        document.getElementById('wrong-sound').play(); 
+        
+        Array.from(document.getElementById('answer-buttons').children).forEach(button => {
+            if (button.dataset.correct === "true") {
+                button.classList.add('correct');
             }
+        });
+    }
+
+    Array.from(document.getElementById('answer-buttons').children).forEach(button => {
+        button.disabled = true;
+    });
+
+    document.getElementById('next-btn').classList.remove('hide');
+}
 
             Array.from(document.getElementById('answer-buttons').children).forEach(button => {
                 button.disabled = true;

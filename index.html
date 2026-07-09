@@ -5,98 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>کویزڵاند | ١٠٠ پرسیاری لۆژیک و مێژوو</title>
     <style>
-        :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-color: #f8fafc;
-            --accent-color: #3b82f6;
-            --accent-hover: #2563eb;
-            --correct-color: #10b981;
-            --incorrect-color: #ef4444;
-        }
+    :root {
+        --bg-color: #050505;
+        --card-bg: #121212;
+        --text-color: #f8e71c;
+        --accent-color: #d4af37;
+        --accent-hover: #b8860b;
+        --correct-color: #27ae60;
+        --incorrect-color: #c0392b;
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        display: flex; justify-content: center; align-items: center;
+        min-height: 100vh; padding: 20px;
+    }
 
-        .container {
-            background-color: var(--card-bg);
-            border-radius: 16px;
-            padding: 30px;
-            width: 100%;
-            max-width: 650px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            text-align: center;
-        }
+    .container {
+        background-color: var(--card-bg);
+        border-radius: 16px; padding: 30px; width: 100%; max-width: 650px;
+        text-align: center; border: 1px solid #332d0a;
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+    }
 
-        h1 {
-            color: var(--accent-color);
-            margin-bottom: 20px;
-            font-size: 2rem;
-        }
+    h1 { color: var(--accent-color); margin-bottom: 20px; font-size: 2rem; }
 
-        .menu-btn, .answer-btn, .next-btn {
-            width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.1rem;
-            font-weight: bold;
-            transition: all 0.2s ease;
-            background-color: var(--accent-color);
-            color: white;
-        }
+    .menu-btn, .answer-btn, .next-btn {
+        width: 100%; padding: 14px; margin: 10px 0; border: 2px solid var(--accent-color);
+        border-radius: 8px; cursor: pointer; font-size: 1.1rem; font-weight: bold;
+        background-color: transparent; color: var(--text-color); transition: 0.3s;
+    }
 
-        .menu-btn:hover, .next-btn:hover {
-            background-color: var(--accent-hover);
-        }
+    .menu-btn:hover, .next-btn:hover { background-color: var(--accent-color); color: #000; }
 
-        .answer-btn {
-            background-color: #334155;
-            text-align: right;
-        }
+    .answer-btn:hover:not([disabled]) { background-color: rgba(212, 175, 55, 0.2); }
 
-        .answer-btn:hover:not([disabled]) {
-            background-color: #475569;
-        }
+    .correct { background-color: var(--correct-color) !important; color: white !important; }
+    .incorrect { background-color: var(--incorrect-color) !important; color: white !important; }
 
-        .correct { background-color: var(--correct-color) !important; }
-        .incorrect { background-color: var(--incorrect-color) !important; }
+    .hide { display: none; }
+    #question-counter { margin-bottom: 15px; color: #d4af37; }
+    #question-text { font-size: 1.3rem; margin-bottom: 25px; }
+</style>
 
-        .hide { display: none; }
         
-        #question-counter {
-            margin-bottom: 15px;
-            font-size: 0.9rem;
-            color: #94a3b8;
-        }
-
-        #question-text {
-            font-size: 1.3rem;
-            margin-bottom: 25px;
-            line-height: 1.6;
-        }
-
-        .score-text {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-        }
-    </style>
+        
 </head>
 <body>
 

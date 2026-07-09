@@ -1060,6 +1060,26 @@ function selectAnswer(e) {
 
     document.getElementById('next-btn').classList.remove('hide');
 }
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData[currentCategory].length) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
 
+        function showResults() {
+            document.getElementById('quiz-screen').classList.add('hide');
+            document.getElementById('result-screen').classList.remove('hide');
+            document.getElementById('score-display').innerText = 
+                `ئەنجامی تۆ: ${score} لە ${quizData[currentCategory].length}`;
+        }
+
+        function showMenu() {
+            document.getElementById('result-screen').classList.add('hide');
+            document.getElementById('menu-screen').classList.remove('hide');
+        }
+    </script>
 </body>
 </html>

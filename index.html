@@ -1059,18 +1059,21 @@
         let score = 0;
 
         function startQuiz(category) {
-            if (category === 'world') {
-                alert('ئەم بەشە بەم زووانە پڕ دەکرێتەوە!');
-                return;
-            }
-            currentCategory = category;
-            currentQuestionIndex = 0;
-            score = 0;
-            document.getElementById('menu-screen').classList.add('hide');
-            document.getElementById('quiz-screen').classList.remove('hide');
-            showQuestion();
-        }
-
+    if (category === 'world') {
+        alert('ئەم بەشە بەم زووانە پڕ دەکرێتەوە!');
+        return;
+    }
+    currentCategory = category;
+    currentQuestionIndex = 0;
+    score = 0;
+    
+    // زیادکردنی ئەم هێڵە بۆ تێکەڵکردنی پرسیارەکان
+    quizData[currentCategory].sort(() => Math.random() - 0.5);
+    
+    document.getElementById('menu-screen').classList.add('hide');
+    document.getElementById('quiz-screen').classList.remove('hide');
+    showQuestion();
+}
         function showQuestion() {
             resetState();
             const currentQuestion = quizData[currentCategory][currentQuestionIndex];
